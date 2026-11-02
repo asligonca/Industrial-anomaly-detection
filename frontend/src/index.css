@@ -1,0 +1,4 @@
+@import 'tailwindcss';
+
+/* Tasarım token'ları (renk, font) FE-1 kapsamında değil; ilgili ekranlarla birlikte
+   `@theme` bloğuna eklenecek. */
