@@ -1,12 +1,48 @@
 @import 'tailwindcss';
 
-/* Tasarım token'ları. Yeni renk/font gerektiren ekranlar buraya ekler. */
+/*
+ * Tasarım token'ları. Ekranlar ham renk kodu yazmaz, buradaki adları kullanır
+ * (`bg-severity-critical`, `text-status-open-ink`, `rounded-card`, `shadow-float` ...).
+ * Yeni renk/yarıçap/gölge gerektiren ekran önce buraya ekler.
+ */
 @theme {
   --font-sans: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+
   --color-danger: #d92d33;
   --color-ok: #16a34a;
   --color-warn: #f5a524;
+
+  /* Önem düzeyi rozeti: zemin ve üzerindeki yazı ("-ink") */
+  --color-severity-critical: #d92d33;
+  --color-severity-critical-ink: #ffffff;
+  --color-severity-high: #f5a524;
+  --color-severity-high-ink: #18181b;
+  --color-severity-medium: #fde9b8;
+  --color-severity-medium-ink: #6b4a00;
+  --color-severity-info: #e4e4e7;
+  --color-severity-info-ink: #3f3f46;
+
+  /* Durum rozeti: zemin, yazı ve nokta. Kapandı ile Yanlış alarm aynı görünür. */
+  --color-status-open: #fde4e4;
+  --color-status-open-ink: #b4232a;
+  --color-status-open-dot: #d92d33;
+  --color-status-reviewing: #fdf0d3;
+  --color-status-reviewing-ink: #7a5200;
+  --color-status-reviewing-dot: #a16207;
+  --color-status-closed: #f4f4f5;
+  --color-status-closed-ink: #52525b;
+  --color-status-closed-dot: #71717a;
+
+  /* Yarıçap: rozet 5, alan/düğme 10, kart 16, giriş kartı gibi büyük yüzey 20 */
+  --radius-badge: 5px;
+  --radius-control: 10px;
+  --radius-card: 16px;
+  --radius-panel: 20px;
+
+  /* Gölge: yüzen düğme ve açılır panel */
+  --shadow-float: 0 8px 24px rgb(24 24 27 / 0.25);
+  --shadow-popover: 0 16px 48px rgb(24 24 27 / 0.16);
 }
 
 body {
@@ -18,4 +54,10 @@ body {
 
 button {
   cursor: pointer;
+}
+
+/* Klavyeyle gezinirken odak her zaman görünür. Fare tıklaması halka çizmez. */
+:focus-visible {
+  outline: 2px solid var(--color-zinc-900);
+  outline-offset: 2px;
 }

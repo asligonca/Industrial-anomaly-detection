@@ -9,6 +9,15 @@ import { PlaceholderPage } from '@/pages/PlaceholderPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  // Bileşen örnek sayfası: yalnızca geliştirmede. DEV üretimde `false`'a çevrilir, import'u derlemeye girmez.
+  ...(import.meta.env.DEV
+    ? [
+        {
+          path: '/dev/ui',
+          lazy: async () => ({ Component: (await import('@/pages/dev/UiKitPage')).UiKitPage }),
+        },
+      ]
+    : []),
   {
     // Bu grubun altındaki her şey için giriş şart.
     element: <RequireAuth />,

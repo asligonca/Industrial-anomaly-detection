@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom'
 import { navItems } from './navItems'
 
 const linkBase =
-  'flex h-[38px] flex-none items-center gap-2 whitespace-nowrap rounded-full px-3.5 text-sm font-medium'
+  'flex h-[38px] flex-none items-center gap-2 whitespace-nowrap rounded-full px-3.5 text-sm font-medium max-[1349px]:px-2.5'
 
 export function MainNav() {
   const role = useAuthStore((s) => s.user?.role)

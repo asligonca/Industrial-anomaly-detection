@@ -1,12 +1,15 @@
-import { Link } from 'react-router-dom'
+import { LinkButton } from '@/components/ui/Button'
+import { EmptyState } from '@/components/ui/EmptyState'
+import { PageHeader } from '@/components/ui/PageHeader'
 
 export function NotFoundPage() {
   return (
-    <section>
-      <h1 className="text-[28px] font-bold tracking-tight">Sayfa bulunamadı</h1>
-      <Link to="/" className="mt-4 inline-block underline">
-        Ana sayfaya dön
-      </Link>
+    <section className="flex flex-col gap-6">
+      <PageHeader title="Sayfa bulunamadı" />
+      <EmptyState
+        title="Aradığınız adres yok ya da taşınmış"
+        action={<LinkButton to="/">Ana sayfaya dön</LinkButton>}
+      />
     </section>
   )
 }

@@ -11,17 +11,17 @@ export function AssistantButton() {
       onClick={toggle}
       aria-label="Sesli asistan"
       aria-pressed={open}
-      className="fixed right-6 bottom-6 z-30 grid size-14 place-items-center rounded-full bg-zinc-900 shadow-[0_8px_24px_rgba(24,24,27,0.25)] hover:bg-zinc-700"
+      className="fixed right-6 bottom-6 z-30 grid size-14 place-items-center rounded-full bg-zinc-900 shadow-float hover:bg-zinc-700"
     >
       <svg
         width="22"
         height="22"
         viewBox="0 0 24 24"
         fill="none"
-        stroke="#fff"
         strokeWidth="1.8"
         strokeLinecap="round"
         strokeLinejoin="round"
+        className="stroke-white"
         aria-hidden
       >
         <rect x="9" y="3" width="6" height="11" rx="3" />

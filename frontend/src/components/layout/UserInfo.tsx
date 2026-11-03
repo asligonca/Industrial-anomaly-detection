@@ -1,8 +1,9 @@
+import { Button } from '@/components/ui/Button'
 import { endSession } from '@/features/auth/session'
 import { roleLabels } from '@/lib/labels'
 import { useAuthStore } from '@/store/auth'
 
-/** Avatar, kullanıcı adı, rol etiketi ve çıkış düğmesi. */
+/** Avatar, kullanıcı adı, rol etiketi ve çıkış düğmesi. Dar ekranda ad/rol yalnızca ekran okuyucuya kalır. */
 export function UserInfo() {
   const user = useAuthStore((s) => s.user)
   if (!user) return null
@@ -16,18 +17,14 @@ export function UserInfo() {
         >
           {user.username.slice(0, 2).toUpperCase()}
         </div>
-        <div className="leading-tight">
+        <div className="leading-tight max-[1449px]:sr-only">
           <div className="text-[13px] font-semibold">{user.username}</div>
           <div className="text-xs text-zinc-500">{roleLabels[user.role]}</div>
         </div>
       </div>
-      <button
-        type="button"
-        onClick={endSession}
-        className="h-[34px] rounded-lg border border-zinc-300 bg-white px-3 text-[13px] hover:bg-zinc-100"
-      >
+      <Button variant="secondary" size="sm" onClick={endSession}>
         Çıkış
-      </button>
+      </Button>
     </div>
   )
 }
