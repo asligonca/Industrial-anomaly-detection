@@ -1,10 +1,12 @@
-import type { User } from '@/types'
+import type { Role, User } from '@/types'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface AuthState {
   token: string | null
   user: User | null
+  /** Son giriş yapan rol. Çıkıştan sonra giriş ekranı bu sekmeyle açılır. */
+  lastRole: Role | null
   setSession: (token: string, user: User) => void
   clearSession: () => void
 }
@@ -18,13 +20,15 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       token: null,
       user: null,
-      setSession: (token, user) => set({ token, user }),
+      lastRole: null,
+      setSession: (token, user) => set({ token, user, lastRole: user.role }),
+      // lastRole bilerek silinmez: çıkıştan sonra giriş sekmesi hatırlansın.
       clearSession: () => set({ token: null, user: null }),
     }),
     {
       name: 'auth',
       // Yalnızca veriyi sakla, fonksiyonları değil.
-      partialize: (state) => ({ token: state.token, user: state.user }),
+      partialize: (state) => ({ token: state.token, user: state.user, lastRole: state.lastRole }),
     },
   ),
 )

@@ -1,6 +1,7 @@
 import { setTokenProvider, setUnauthorizedHandler } from '@/api/client'
 import { queryClient } from '@/queryClient'
 import { useAuthStore } from '@/store/auth'
+import { useUiStore } from '@/store/ui'
 import type { User } from '@/types'
 
 /** Giriş: önceki kullanıcıdan kalan önbellek yeni oturuma karışmasın diye temizlenir. */
@@ -12,6 +13,7 @@ export function startSession(token: string, user: User) {
 /** Çıkış (kullanıcı ya da 401): oturum silinir, önbellek temizlenir. Guard `/login`'e yönlendirir. */
 export function endSession() {
   useAuthStore.getState().clearSession()
+  useUiStore.getState().closeAssistant()
   queryClient.clear()
 }
 

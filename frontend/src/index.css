@@ -5,11 +5,14 @@
   --font-sans: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, monospace;
   --color-danger: #d92d33;
+  --color-ok: #16a34a;
+  --color-warn: #f5a524;
 }
 
 body {
   font-family: var(--font-sans);
   color: var(--color-zinc-900);
+  background: var(--color-zinc-100);
   -webkit-font-smoothing: antialiased;
 }
 

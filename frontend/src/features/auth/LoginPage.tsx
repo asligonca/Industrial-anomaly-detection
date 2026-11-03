@@ -19,29 +19,34 @@ const tabs: { role: Role; label: string; username: string; submitLabel: string }
 const inputClass =
   'h-11 rounded-[10px] border border-zinc-300 bg-white px-3.5 text-[15px] text-zinc-900 outline-none focus:border-zinc-900'
 
+const DEMO_PASSWORD = '1234'
+
+type Tab = (typeof tabs)[number]
+
 export function LoginPage() {
   const token = useAuthStore((s) => s.token)
-  const [role, setRole] = useState<Role>('operator')
-  const [username, setUsername] = useState('operator1')
-  const [password, setPassword] = useState('1234')
+  // Çıkıştan sonra son kullanılan rolün sekmesi açılır; ilk girişte Operatör.
+  const [tab, setTab] = useState<Tab>(
+    () => tabs.find((t) => t.role === useAuthStore.getState().lastRole) ?? tabs[0]!,
+  )
+  const [username, setUsername] = useState(tab.username)
+  const [password, setPassword] = useState(DEMO_PASSWORD)
   const login = useLogin()
 
   // Zaten girişli kullanıcı (ya da giriş az önce başarılı oldu): ana ekrana.
   if (token) return <Navigate to="/" replace />
 
-  const tab = tabs.find((t) => t.role === role) ?? tabs[0]!
-
-  function selectTab(next: (typeof tabs)[number]) {
-    setRole(next.role)
+  function selectTab(next: Tab) {
+    setTab(next)
     setUsername(next.username)
-    setPassword('1234')
+    setPassword(DEMO_PASSWORD)
     login.reset()
   }
 
   function onSubmit(e: SyntheticEvent<HTMLFormElement>) {
     e.preventDefault()
     login.mutate(
-      { username, password, role },
+      { username, password, role: tab.role },
       { onSuccess: ({ access_token, user }) => startSession(access_token, user) },
     )
   }
@@ -66,10 +71,10 @@ export function LoginPage() {
               key={t.role}
               type="button"
               role="tab"
-              aria-selected={t.role === role}
+              aria-selected={t.role === tab.role}
               onClick={() => selectTab(t)}
               className={`h-[38px] flex-1 rounded-[7px] text-sm font-medium ${
-                t.role === role ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'
+                t.role === tab.role ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500'
               }`}
             >
               {t.label}
