@@ -17,9 +17,22 @@ type TokenProvider = () => string | null
 
 let getToken: TokenProvider = () => null
 
-/** FE-3'teki auth store burayı bağlar: setTokenProvider(() => useAuth.getState().token) */
+/** Uygulama açılırken auth store burayı bağlar (bkz. features/auth/session.ts). */
 export function setTokenProvider(provider: TokenProvider) {
   getToken = provider
+}
+
+/** `sentToken`: reddedilen isteğin gönderdiği token. Güncel oturumla karşılaştırmak için. */
+type UnauthorizedHandler = (sentToken: string) => void
+
+let onUnauthorized: UnauthorizedHandler = () => {}
+
+/**
+ * 401 yanıtında, istek bir token ile gitmişse çağrılır (oturumu kapatmak için).
+ * `skipUnauthorizedHandler` isteklerde atlanır.
+ */
+export function setUnauthorizedHandler(handler: UnauthorizedHandler) {
+  onUnauthorized = handler
 }
 
 type QueryValue = string | number | boolean | null | undefined
@@ -36,6 +49,8 @@ interface RequestOptions {
   /** Boş (undefined/null/'') değerler URL'e eklenmez */
   query?: QueryParams
   signal?: AbortSignal
+  /** true: 401 oturumu kapatmaz, yalnızca hata fırlatır (giriş isteği: yanlış parola 401 döner) */
+  skipUnauthorizedHandler?: boolean
 }
 
 /** Sondaki "/" atılmış API taban adresi. Mock handler'ları da bunu kullanır. */
@@ -66,7 +81,7 @@ function messageFrom(status: number, detail: unknown): string {
 
 /** Tüm API istekleri buradan geçer: taban adres, token ve hata biçimi tek yerde. */
 export async function apiRequest<T>(path: string, options: RequestOptions = {}): Promise<T> {
-  const { method = 'GET', json, form, query, signal } = options
+  const { method = 'GET', json, form, query, signal, skipUnauthorizedHandler } = options
   const headers = new Headers({ Accept: 'application/json' })
   let body: BodyInit | undefined
 
@@ -92,6 +107,8 @@ export async function apiRequest<T>(path: string, options: RequestOptions = {}):
   }
 
   if (!response.ok) {
+    // Token yok/süresi dolmuş/geçersiz: oturumu kapat (giriş ekranına yönlendirme guard'dan gelir).
+    if (response.status === 401 && token && !skipUnauthorizedHandler) onUnauthorized(token)
     const data = (await response.json().catch(() => null)) as { detail?: unknown } | null
     const detail = data?.detail
     throw new ApiError(response.status, messageFrom(response.status, detail), detail)

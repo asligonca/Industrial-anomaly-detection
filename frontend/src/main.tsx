@@ -3,6 +3,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { RouterProvider } from 'react-router-dom'
 import { config } from './config'
+import { initAuth } from './features/auth/session'
 import './index.css'
 import { queryClient } from './queryClient'
 import { router } from './router'
@@ -17,6 +18,8 @@ async function enableMocking() {
   // Handler'ı olmayan istekler (görseller, Vite dosyaları) sessizce gerçek ağa gider.
   await worker.start({ onUnhandledFrame: 'bypass' })
 }
+
+initAuth()
 
 enableMocking()
   .catch((error) => {

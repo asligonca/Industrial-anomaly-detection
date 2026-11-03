@@ -1,4 +1,18 @@
 @import 'tailwindcss';
 
-/* Tasarım token'ları (renk, font) FE-1 kapsamında değil; ilgili ekranlarla birlikte
-   `@theme` bloğuna eklenecek. */
+/* Tasarım token'ları. Yeni renk/font gerektiren ekranlar buraya ekler. */
+@theme {
+  --font-sans: 'Schibsted Grotesk', 'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --color-danger: #d92d33;
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-zinc-900);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  cursor: pointer;
+}
