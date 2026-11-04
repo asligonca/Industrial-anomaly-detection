@@ -3,7 +3,7 @@ import { RequireAuth } from '@/features/auth/RequireAuth'
 import { LoginPage } from '@/features/auth/LoginPage'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { createBrowserRouter } from 'react-router-dom'
-import { HomePage } from '@/pages/HomePage'
+import { LiveViewPage } from '@/features/live/LiveViewPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { PlaceholderPage } from '@/pages/PlaceholderPage'
 
@@ -26,7 +26,7 @@ export const router = createBrowserRouter([
         // Girişli sayfaların ortak kabuğu: üst bar, içerik alanı, asistan düğmesi.
         element: <AppShell />,
         children: [
-          { path: '/', element: <HomePage /> },
+          { path: '/', element: <LiveViewPage /> },
           { path: '/events', element: <PlaceholderPage title="Olaylar" /> },
           { path: '/events/:id', element: <PlaceholderPage title="Olay detayı" /> },
           { path: '/records', element: <PlaceholderPage title="Kayıtlar" /> },

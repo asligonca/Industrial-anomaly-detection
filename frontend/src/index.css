@@ -34,6 +34,9 @@
   --color-status-closed-ink: #52525b;
   --color-status-closed-dot: #71717a;
 
+  /* Kamera kartındaki "KAM-01" kodu (koyu görüntü üstünde) */
+  --color-camera-code: #fbbf24;
+
   /* Yarıçap: rozet 5, alan/düğme 10, kart 16, giriş kartı gibi büyük yüzey 20 */
   --radius-badge: 5px;
   --radius-control: 10px;

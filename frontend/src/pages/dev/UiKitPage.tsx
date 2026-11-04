@@ -3,14 +3,27 @@ import { Button, LinkButton } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorBox } from '@/components/ui/ErrorBox'
+import { FilterChips } from '@/components/ui/FilterChips'
 import { Input } from '@/components/ui/Input'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { EventStatus, Severity } from '@/types'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 
 const severities: Severity[] = ['critical', 'high', 'medium', 'info']
 const statuses: EventStatus[] = ['new', 'reviewing', 'confirmed', 'false_alarm']
+const groupOptions = [
+  { value: 'all', label: 'Tümü' },
+  { value: 'production', label: 'Üretim' },
+  { value: 'storage', label: 'Depo' },
+]
+
+function FilterChipsDemo() {
+  const [value, setValue] = useState('all')
+  return (
+    <FilterChips label="Örnek filtre" options={groupOptions} value={value} onChange={setValue} />
+  )
+}
 
 function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
@@ -55,6 +68,10 @@ export function UiKitPage() {
             Devre dışı
           </Button>
         </div>
+      </Block>
+
+      <Block title="Filtre (tek seçim)">
+        <FilterChipsDemo />
       </Block>
 
       <Block title="Önem rozeti (sm / md / lg)">

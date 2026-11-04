@@ -2,6 +2,7 @@ import { cn } from '@/lib/cn'
 import { eventStatusLabels, severityLabels } from '@/lib/labels'
 import type { EventStatus, Severity } from '@/types'
 import type { ReactNode } from 'react'
+import { severityTones } from './badgeTones'
 
 type BadgeSize = 'sm' | 'md' | 'lg'
 
@@ -31,13 +32,6 @@ export function Badge({ size = 'md', tone, children }: BadgeProps) {
       {children}
     </span>
   )
-}
-
-const severityTones: Record<Severity, string> = {
-  critical: 'bg-severity-critical text-severity-critical-ink',
-  high: 'bg-severity-high text-severity-high-ink',
-  medium: 'bg-severity-medium text-severity-medium-ink',
-  info: 'bg-severity-info text-severity-info-ink',
 }
 
 /** Önem düzeyi rozeti (KRİTİK / YÜKSEK / ORTA / BİLGİ). */
