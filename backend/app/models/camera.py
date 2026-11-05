@@ -1,15 +1,15 @@
-from datetime import datetime          # 1. standart kütüphane import'ları alfabetik: datetime, typing
+from datetime import datetime         
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
-                                       # 2. if bloğundan önce bir boş satır
+
 if TYPE_CHECKING:
     from app.models.zone import Zone
 
-                                       # 3. sınıftan önce iki boş satır
+
 class Camera(Base):
     __tablename__ = "cameras"
 
