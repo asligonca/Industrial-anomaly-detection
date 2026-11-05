@@ -43,7 +43,7 @@ Tablolar (FE-12 / #25 kararları işlendi):
 | --- | --- | --- |
 | `users` | id, username, password_hash, role, is_active, last_login_at, created_at | role: `admin` / `operator` |
 | `cameras` | id, name, area, location, stream_url, is_active, created_at | `area` serbest metin (String(50)); silme = soft delete (`is_active=False`) |
-| `zones` | id, camera_id → cameras, name, polygon (JSON), rule_type | rule_type enum: restricted, ppe_helmet_vest, ppe_helmet, ppe_vest, forklift_proximity, smoke_fire, person_near_equipment (Cudi ile netleşecek) |
+| `zones` | id, camera_id → cameras, name, polygon (JSON), rule_type, is_active | silme = soft delete (`is_active=False`), eski olaylar bölgesini kaybetmesin diye; polygon birimi Aslı ve Cudi ile netleşecek (öneri: 0–1 oran); rule_type enum: restricted, ppe_helmet_vest, ppe_helmet, ppe_vest, forklift_proximity, smoke_fire, person_near_equipment (Cudi ile netleşecek) |
 | `anomaly_events` | id, camera_id, zone_id, type, severity, confidence, bbox (JSON), snapshot_path, track_id, status, created_at | status: `new` / `reviewing` / `confirmed` / `false_alarm`; severity: `critical` / `high` / `medium` / `info` (backend `type`'tan doldurur); `code` ("OLY-014") DB'de yok, yanıtta üretilir |
 | `alarm_actions` | id, event_id, user_id, action, note, created_at | kim, hangi alarmı, ne zaman işaretledi |
 | `agent_logs` | id, user_id, query, response, created_at | Sprint 4'te doldurulacak |
@@ -53,7 +53,7 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [ ] `app/db/base.py` (Base) ve `app/db/session.py` (engine, SessionLocal, `get_db`)
 - [ ] Enum'lar + `User`, `Camera`, `Zone` modelleri
 - [ ] `AnomalyEvent`, `AlarmAction` modelleri
-- [ ] `created_at` ve `camera_id` üzerine index
+- [ ] `anomaly_events` tablosunda `created_at` ve `camera_id` üzerine index (küçük tablolarda index yok, foreign key sütunlarında var)
 - [ ] **Alembic** kurulumu + ilk migration; şema değişikliği hep migration ile
 - [ ] PR (açıklamaya `Closes #25` değil, `Refs #25` — sözleşmenin tamamı bu PR'da bitmiyor)
 

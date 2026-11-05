@@ -22,7 +22,7 @@ Frontend ile API sözleşmesi: GitHub issue #25 (FE-12).
 - DB kullanan endpoint'ler `def` (async değil); oturum `Depends(get_db)` ile gelir.
 - Her tablo için ayrı Pydantic şemaları: `XCreate`, `XUpdate` (alanlar opsiyonel), `XRead`.
 - Liste uçları `{"items": [...], "total": n}` döner. Tarihler UTC, ISO 8601.
-- Alan adları snake_case. Kamera silme = soft delete (`is_active = False`).
+- Alan adları snake_case. Kamera ve bölge silme = soft delete (`is_active = False`).
 
 ## Alınan kararlar (#25)
 - Olay `status`: new, reviewing, confirmed, false_alarm

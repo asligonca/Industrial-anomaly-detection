@@ -1,4 +1,4 @@
-from datetime import datetime         
+from datetime import datetime       
 from typing import TYPE_CHECKING
 
 from sqlalchemy import DateTime, String, func
@@ -20,9 +20,7 @@ class Camera(Base):
     stream_url: Mapped[str | None] = mapped_column(String(500))
     is_active: Mapped[bool] = mapped_column(default=True)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True), server_default=func.now(), index=True
+        DateTime(timezone=True), server_default=func.now()
     )
 
     zones: Mapped[list["Zone"]] = relationship(back_populates="camera")
-
-

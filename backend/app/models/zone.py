@@ -20,4 +20,6 @@ class Zone(Base):
     rule_type: Mapped[ZoneRuleType] = mapped_column(
         Enum(ZoneRuleType, native_enum=False, length=50)
     )
+    is_active: Mapped[bool] = mapped_column(default=True)
+
     camera: Mapped["Camera"] = relationship(back_populates="zones")
