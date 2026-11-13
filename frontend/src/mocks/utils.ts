@@ -1,5 +1,5 @@
 import { apiBaseUrl } from '@/api/client'
-import type { Role, User } from '@/types'
+import type { Paginated, Role, User } from '@/types'
 import { delay, HttpResponse, type DefaultBodyType, type PathParams, type StrictRequest } from 'msw'
 import { db } from './db'
 
@@ -27,6 +27,49 @@ export async function readJsonObject(request: Request): Promise<Record<string, u
   } catch {
     return null
   }
+}
+
+/** Boş olmayan metin ise kırpılmış hali, değilse null (zorunlu alan kontrolü). */
+export function nonEmptyString(value: unknown): string | null {
+  return typeof value === 'string' && value.trim() ? value.trim() : null
+}
+
+/** Adres parametresindeki id tam sayı değilse 422 yanıtı, sayıysa sayı. */
+export function parseId(raw: string): number | Response {
+  return /^\d+$/.test(raw) ? Number(raw) : errorResponse(422, 'id must be an integer')
+}
+
+const DEFAULT_LIMIT = 50
+const MAX_LIMIT = 200
+
+function parseCount(value: string | null, fallback: number): number | null {
+  if (value === null) return fallback
+  return /^\d+$/.test(value) ? Number(value) : null
+}
+
+export interface PageParams {
+  limit: number
+  offset: number
+}
+
+/** `?limit=&offset=` okur (varsayılan 50 / 0). Geçersizse 422 yanıtı. */
+export function readPage(params: URLSearchParams): PageParams | Response {
+  const limit = parseCount(params.get('limit'), DEFAULT_LIMIT)
+  const offset = parseCount(params.get('offset'), 0)
+  if (limit === null || limit < 1 || limit > MAX_LIMIT || offset === null) {
+    return errorResponse(422, `limit must be 1–${MAX_LIMIT} and offset must be >= 0`)
+  }
+  return { limit, offset }
+}
+
+/** Sayfalı liste yanıtı: `{ items, total, limit, offset }` (`total` filtrelenmiş toplam). */
+export function paginate<T>(rows: T[], { limit, offset }: PageParams): Paginated<T> {
+  return { items: rows.slice(offset, offset + limit), total: rows.length, limit, offset }
+}
+
+/** Backend gibi: yayın adresindeki parola yanıtta "***" olur, gerçeği API'den hiç dönmez. */
+export function maskStreamPassword(url: string): string {
+  return url.replace(/^([a-z][a-z0-9+.-]*:\/\/[^:@/]+):[^@/]*@/i, '$1:***@')
 }
 
 const TOKEN_PREFIX = 'mock.'

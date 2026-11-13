@@ -1,10 +1,20 @@
 import { config } from '@/config'
 import { publicAssetUrl } from '@/lib/publicAssetUrl'
-import type { Camera } from '@/types'
+import type { Camera, CameraCreate, CameraUpdate } from '@/types'
 import { apiBaseUrl, apiRequest, withToken } from './client'
 
 export function getCameras(signal?: AbortSignal) {
   return apiRequest<Camera[]>('/cameras', { signal })
+}
+
+/** Yalnızca admin. */
+export function createCamera(camera: CameraCreate) {
+  return apiRequest<Camera>('/cameras', { method: 'POST', json: camera })
+}
+
+/** Yalnızca admin. Gönderilmeyen alanlar değişmez (aktif / pasif için `{ is_active }`). */
+export function updateCamera(id: number, update: CameraUpdate) {
+  return apiRequest<Camera>(`/cameras/${id}`, { method: 'PATCH', json: update })
 }
 
 /**

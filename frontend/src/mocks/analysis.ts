@@ -3,7 +3,7 @@
  * Gerçekte bu metinleri ajanlar üretir; şekil `EventAnalysis` tipiyle aynı kalır.
  */
 import { formatConfidence } from '@/lib/format'
-import { eventTypeLabels, severityLabels } from '@/lib/labels'
+import { eventTypeLabel, severityLabels } from '@/lib/labels'
 import type { AnomalyEvent, EventAnalysis, EventType, Severity } from '@/types'
 import { db } from './db'
 
@@ -37,7 +37,7 @@ export function buildEventAnalysis(event: AnomalyEvent): EventAnalysis {
   const createdAt = new Date(event.created_at)
   const at = (ms: number) => new Date(createdAt.getTime() + ms).toISOString()
   const cameraName = db.cameras.find((c) => c.id === event.camera_id)?.name ?? 'Bilinmeyen kamera'
-  const type = eventTypeLabels[event.type].toLocaleLowerCase('tr')
+  const type = eventTypeLabel(event.type).toLocaleLowerCase('tr')
   const sameCameraToday = db.events.filter(
     (e) => e.camera_id === event.camera_id && sameDay(new Date(e.created_at), createdAt),
   ).length

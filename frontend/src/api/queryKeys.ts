@@ -1,4 +1,5 @@
 import type { EventFilters, EventStatsRange } from '@/types'
+import type { PageQuery } from './pageQuery'
 
 /**
  * Sorgu anahtarları tek yerde. Hiyerarşik: ['events'] geçersiz kılınınca
@@ -11,6 +12,15 @@ export const queryKeys = {
   },
   zones: {
     all: ['zones'] as const,
+  },
+  users: {
+    all: ['users'] as const,
+    list: (page: PageQuery) => ['users', 'list', page] as const,
+  },
+  /** Her yazma işlemi (durum değişikliği, kamera, bölge, kullanıcı) bunu geçersiz kılar. */
+  auditLogs: {
+    all: ['audit-logs'] as const,
+    list: (page: PageQuery) => ['audit-logs', 'list', page] as const,
   },
   events: {
     all: ['events'] as const,

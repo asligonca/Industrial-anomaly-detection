@@ -2,7 +2,7 @@ import { eventSnapshotUrl } from '@/api/events'
 import { SeverityBadge } from '@/components/ui/Badge'
 import { LinkButton } from '@/components/ui/Button'
 import { formatConfidence, formatDay, formatTime, isSameDay } from '@/lib/format'
-import { cameraCode, eventCode, eventTypeLabels } from '@/lib/labels'
+import { cameraCode, eventCode, eventTypeLabel } from '@/lib/labels'
 import type { AnomalyEvent } from '@/types'
 import { useState } from 'react'
 import { StatusMenu } from './StatusMenu'
@@ -19,7 +19,7 @@ interface RecordRowProps {
 export function RecordRow({ event, cameraName, now }: RecordRowProps) {
   const [imageFailed, setImageFailed] = useState(false)
   const created = new Date(event.created_at)
-  const type = eventTypeLabels[event.type]
+  const type = eventTypeLabel(event.type)
   const code = eventCode(event.id)
 
   return (

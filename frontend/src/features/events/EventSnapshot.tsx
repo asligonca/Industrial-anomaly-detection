@@ -1,6 +1,6 @@
 import { eventSnapshotUrl } from '@/api/events'
 import { formatDateTime } from '@/lib/format'
-import { cameraCode, eventTypeLabels } from '@/lib/labels'
+import { cameraCode, eventTypeLabel } from '@/lib/labels'
 import type { AnomalyEvent, BBox } from '@/types'
 import { useState, type CSSProperties } from 'react'
 
@@ -30,7 +30,7 @@ interface EventSnapshotProps {
  */
 export function EventSnapshot({ event, cameraName }: EventSnapshotProps) {
   const [failed, setFailed] = useState(false)
-  const type = eventTypeLabels[event.type]
+  const type = eventTypeLabel(event.type)
 
   return (
     <figure className="relative overflow-hidden rounded-card bg-zinc-800">

@@ -25,9 +25,12 @@ export const users: User[] = [
   },
 ]
 
-/** Yalnızca mock'ta: gerçek API parolayı ya da hash'ini asla döndürmez. */
+/**
+ * Yalnızca mock'ta: gerçek API parolayı ya da hash'ini asla döndürmez. Backend kuralı en az 8
+ * karakter; demo parolaları seed'deki gibi (backend-notlari madde 28).
+ */
 export const mockPasswords: Record<string, string> = {
-  admin: '1234',
-  operator1: '1234',
-  operator2: '1234',
+  admin: 'admin1234',
+  operator1: 'operator1234',
+  operator2: 'operator1234',
 }

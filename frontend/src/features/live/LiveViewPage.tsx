@@ -6,9 +6,10 @@ import { FilterChips, type FilterOption } from '@/components/ui/FilterChips'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { cn } from '@/lib/cn'
+import { cameraAreas } from '@/lib/cameraAreas'
 import { useMemo, useState } from 'react'
 import { CameraTile } from './CameraTile'
-import { cameraGroups, cameraHighlights } from './cameraHighlights'
+import { cameraHighlights } from './cameraHighlights'
 
 const ALL = 'all'
 const SKELETON_COUNT = 6
@@ -24,7 +25,7 @@ export function LiveViewPage() {
   const openEvents = useOpenEvents()
   const [group, setGroup] = useState<string>(ALL)
 
-  const groups = useMemo(() => cameraGroups(cameras.data ?? []), [cameras.data])
+  const groups = useMemo(() => cameraAreas(cameras.data ?? []), [cameras.data])
   const highlights = useMemo(
     () => cameraHighlights(openEvents.data?.items ?? []),
     [openEvents.data],
@@ -87,7 +88,7 @@ export function LiveViewPage() {
                 highlight={highlights.get(camera.id)}
                 featured={featured}
                 className={featured ? featuredClass : undefined}
-                dimmed={activeGroup !== ALL && camera.group !== activeGroup}
+                dimmed={activeGroup !== ALL && camera.area !== activeGroup}
               />
             )
           })}

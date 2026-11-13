@@ -1,6 +1,7 @@
 import { Badge, SeverityBadge, StatusBadge } from '@/components/ui/Badge'
 import { Button, LinkButton } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { Dialog } from '@/components/ui/Dialog'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { FilterChips } from '@/components/ui/FilterChips'
@@ -8,7 +9,9 @@ import { Input } from '@/components/ui/Input'
 import { inputClass } from '@/components/ui/inputStyles'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Pagination } from '@/components/ui/Pagination'
+import { Select } from '@/components/ui/Select'
 import { Skeleton } from '@/components/ui/Skeleton'
+import { Switch } from '@/components/ui/Switch'
 import type { EventStatus, Severity } from '@/types'
 import { useState, type ReactNode } from 'react'
 
@@ -30,6 +33,45 @@ function FilterChipsDemo() {
 function PaginationDemo() {
   const [page, setPage] = useState(1)
   return <Pagination page={page} pageSize={20} total={57} onPageChange={setPage} />
+}
+
+function SwitchDemo() {
+  const [on, setOn] = useState(true)
+  const [off, setOff] = useState(false)
+  return (
+    <div className="flex flex-wrap items-center gap-5">
+      <Switch checked={on} onCheckedChange={setOn} aria-label="Örnek anahtar (açık)" />
+      <Switch checked={off} onCheckedChange={setOff} aria-label="Örnek anahtar (kapalı)" />
+      <Switch checked busy onCheckedChange={() => undefined} aria-label="Kaydediliyor" />
+    </div>
+  )
+}
+
+function DialogDemo() {
+  const [open, setOpen] = useState(false)
+  return (
+    <>
+      <Button variant="secondary" size="md" onClick={() => setOpen(true)}>
+        Pencereyi aç
+      </Button>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        title="Örnek pencere"
+        description="Escape ya da Kapat ile kapanır; odak açan düğmeye döner."
+      >
+        <Input label="Ad" data-autofocus />
+        <div className="flex justify-end gap-2">
+          <Button variant="secondary" size="md" onClick={() => setOpen(false)}>
+            Vazgeç
+          </Button>
+          <Button size="md" onClick={() => setOpen(false)}>
+            Tamam
+          </Button>
+        </div>
+      </Dialog>
+    </>
+  )
 }
 
 function Block({ title, children }: { title: string; children: ReactNode }) {
@@ -74,6 +116,24 @@ export function UiKitPage() {
           <Button variant="secondary" disabled>
             Devre dışı
           </Button>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <Button variant="danger" size="md">
+            Tehlikeli (md)
+          </Button>
+          <Button variant="danger" size="sm">
+            Sil
+          </Button>
+        </div>
+      </Block>
+
+      <Block title="Anahtar (açık / kapalı / kaydediliyor)">
+        <SwitchDemo />
+      </Block>
+
+      <Block title="Pencere (Dialog)">
+        <div>
+          <DialogDemo />
         </div>
       </Block>
 
@@ -128,6 +188,10 @@ export function UiKitPage() {
         <div className="grid gap-4 sm:grid-cols-2">
           <Input label="Kullanıcı adı" defaultValue="operator1" />
           <Input label="Parola" type="password" error="Parola en az 4 karakter olmalı." />
+          <Select label="Rol" defaultValue="operator">
+            <option value="operator">Operatör</option>
+            <option value="admin">Yönetici</option>
+          </Select>
         </div>
         {/* Etiketi görünmeyen alanlar (arama, not, tarih) `Input` yerine `inputClass` kullanır. */}
         <div className="flex flex-wrap items-center gap-3">

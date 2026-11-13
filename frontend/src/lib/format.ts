@@ -39,3 +39,19 @@ export function formatConfidence(value: number): string {
 export function formatSeconds(ms: number): string {
   return `${(ms / 1000).toFixed(1).replace('.', ',')} sn`
 }
+
+/** Yerel saatle "SS:DD" (09:04). */
+export function formatHourMinute(date: Date): string {
+  return `${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}`
+}
+
+/**
+ * Gün adıyla kısa zaman: "Bugün 09:04", "Dün 22:10", daha eskiyse "12.11.2026 08:30".
+ * Kullanıcıların son girişi ve denetim kayıtları gibi birkaç güne yayılan listeler için.
+ */
+export function formatRelativeDayTime(date: Date, now: Date): string {
+  const yesterday = new Date(now)
+  yesterday.setDate(now.getDate() - 1)
+  const day = isSameDay(date, now) ? 'Bugün' : isSameDay(date, yesterday) ? 'Dün' : formatDay(date)
+  return `${day} ${formatHourMinute(date)}`
+}

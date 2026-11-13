@@ -1,4 +1,9 @@
-import { eventCategories, eventCategoryTypes, type EventCategory } from '@/lib/labels'
+import {
+  eventCategories,
+  eventCategoryTypes,
+  eventTypesMatching,
+  type EventCategory,
+} from '@/lib/labels'
 import type { EventFilters, EventStatsRange } from '@/types'
 
 export const RECORDS_PAGE_SIZE = 20
@@ -80,14 +85,27 @@ export function toStatsRange({ from, to }: DayRange): EventStatsRange {
   }
 }
 
+/**
+ * Ekrandaki filtreler -> `GET /events` parametreleri. Backend `q`'yu yalnızca olay kodunda ve
+ * kamera adı / kodunda arar; Türkçe tür adını bilmez. Arama bir tür adıysa ("baret") `type`
+ * olarak gider (kategori seçiliyse onunla kesişimi). Kesişim boşsa `q` olduğu gibi gider: backend
+ * kodlarda ve kamera adlarında bulamaz, sonuç doğru olarak boş çıkar.
+ */
 export function toEventFilters(filters: RecordsFilters): EventFilters {
   const q = filters.q.trim()
+  const categoryTypes = filters.category === 'all' ? null : eventCategoryTypes(filters.category)
+  const page = { limit: RECORDS_PAGE_SIZE, offset: (filters.page - 1) * RECORDS_PAGE_SIZE }
+
+  const queryTypes = eventTypesMatching(q).filter(
+    (t) => !categoryTypes || categoryTypes.includes(t),
+  )
+  if (queryTypes.length > 0) return { ...toStatsRange(filters), type: queryTypes, ...page }
+
   return {
     ...toStatsRange(filters),
     ...(q ? { q } : {}),
-    ...(filters.category === 'all' ? {} : { type: eventCategoryTypes(filters.category) }),
-    limit: RECORDS_PAGE_SIZE,
-    offset: (filters.page - 1) * RECORDS_PAGE_SIZE,
+    ...(categoryTypes ? { type: categoryTypes } : {}),
+    ...page,
   }
 }
 

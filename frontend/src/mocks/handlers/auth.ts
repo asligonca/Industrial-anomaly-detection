@@ -1,6 +1,5 @@
 import type { LoginResponse } from '@/types'
 import { http, HttpResponse } from 'msw'
-import { mockPasswords } from '../data/users'
 import { addAuditLog, db } from '../db'
 import {
   apiPath,
@@ -29,13 +28,18 @@ export const authHandlers = [
 
     const user = db.users.find(
       (u) =>
-        u.username === credentials.username && mockPasswords[u.username] === credentials.password,
+        u.username === credentials.username && db.passwords[u.username] === credentials.password,
     )
     if (!user) return errorResponse(401, 'Incorrect username or password')
 
     user.last_login_at = new Date().toISOString()
-    addAuditLog(user.username, 'Oturum açıldı')
-    const body: LoginResponse = { access_token: createToken(user), token_type: 'bearer', user }
+    addAuditLog(user, 'user.login', { type: 'user', id: user.id }, { label: user.username })
+    // Backend kararı: giriş yanıtında kullanıcının yalnızca kimliği ve rolü.
+    const body: LoginResponse = {
+      access_token: createToken(user),
+      token_type: 'bearer',
+      user: { id: user.id, username: user.username, role: user.role },
+    }
     return HttpResponse.json(body)
   }),
 ]

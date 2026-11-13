@@ -1,13 +1,13 @@
-import type { Role, User } from '@/types'
+import type { Role, SessionUser } from '@/types'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 interface AuthState {
   token: string | null
-  user: User | null
+  user: SessionUser | null
   /** Son giriş yapan rol. Çıkıştan sonra giriş ekranı bu sekmeyle açılır. */
   lastRole: Role | null
-  setSession: (token: string, user: User) => void
+  setSession: (token: string, user: SessionUser) => void
   clearSession: () => void
 }
 

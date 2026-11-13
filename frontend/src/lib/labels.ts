@@ -47,9 +47,23 @@ export const ruleTypeLabels: Record<RuleType, string> = {
   person_near_equipment: 'Ekipman yanında insan',
 }
 
+/**
+ * Tür etiketi. Backend bilmediğimiz bir kod gönderirse (yeni tür eklendiyse) arayüz çökmez, kodu
+ * olduğu gibi yazar. Ekranlar haritayı doğrudan değil bunu kullanır.
+ */
+export function eventTypeLabel(type: EventType): string {
+  return (eventTypeLabels as Partial<Record<string, string>>)[type] ?? type
+}
+
+/** İstatistik grafiğindeki geniş tür adı; bilinmeyen kodda kodun kendisi. */
+export function eventTypeStatLabel(type: EventType): string {
+  return (eventTypeStatLabels as Partial<Record<string, string>>)[type] ?? type
+}
+
 /** Geçerli kodlar, etiket haritalarından türetilir; yeni kod eklenince tek yerde tutulur. */
 export const eventTypes = Object.keys(eventTypeLabels) as EventType[]
 export const eventStatuses = Object.keys(eventStatusLabels) as EventStatus[]
+export const ruleTypes = Object.keys(ruleTypeLabels) as RuleType[]
 
 /** Operatörün ilgilenmesi gereken durumlar (Olaylar listesi, menü rozeti, kamera vurgusu). */
 export const OPEN_STATUSES: EventStatus[] = ['new', 'reviewing']
@@ -66,6 +80,8 @@ export const roleLabels: Record<Role, string> = {
   admin: 'Yönetici',
   operator: 'Operatör',
 }
+
+export const roles = Object.keys(roleLabels) as Role[]
 
 /** Olaylar ekranındaki filtre kategorisi. Saklanmaz, `type`'tan türetilir. */
 export type EventCategory = 'helmet' | 'vest' | 'restricted' | 'other'
@@ -85,6 +101,25 @@ export function eventCategory(type: EventType): EventCategory {
 }
 
 export const eventCategories = Object.keys(eventCategoryLabels) as EventCategory[]
+
+const normalizeText = (text: string) => text.toLocaleLowerCase('tr-TR')
+
+/**
+ * Arama metniyle eşleşen türler: Türkçe adın (ya da istatistik adının) bir kelimesi metinle
+ * başlıyorsa ("bar" -> Baret yok). Backend Türkçe adları bilmez; arayüz bunları `type`
+ * parametresine çevirir. Kelime başı aranır ki "an" gibi kısa metin her türü yakalamasın.
+ */
+export function eventTypesMatching(text: string): EventType[] {
+  const query = normalizeText(text.trim())
+  if (!query) return []
+  return eventTypes.filter((type) =>
+    [eventTypeLabels[type], eventTypeStatLabels[type]].some((label) =>
+      normalizeText(label)
+        .split(/[\s/–-]+/)
+        .some((word) => word.startsWith(query)),
+    ),
+  )
+}
 
 /** Kategorinin kapsadığı türler. API'ye `?type=` olarak bunlar gider. */
 export function eventCategoryTypes(category: EventCategory): EventType[] {

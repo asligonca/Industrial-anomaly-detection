@@ -1,5 +1,5 @@
 import { isOpenStatus } from '@/lib/labels'
-import type { AnomalyEvent, Camera, Severity } from '@/types'
+import type { AnomalyEvent, Severity } from '@/types'
 
 /** Kamera kartında gösterilen açık olay ve o kameradaki diğer açık olay sayısı. */
 export interface CameraHighlight {
@@ -32,9 +32,4 @@ export function cameraHighlights(events: readonly AnomalyEvent[]): Map<number, C
     }
   }
   return byCamera
-}
-
-/** Kameralardaki grup adları, ilk görülme sırasıyla ve tekrarsız. */
-export function cameraGroups(cameras: readonly Camera[]): string[] {
-  return [...new Set(cameras.map((camera) => camera.group))]
 }

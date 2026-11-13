@@ -18,8 +18,10 @@ export interface Zone {
   name: string
   polygon: Point[]
   rule_type: RuleType
+  /** Silme yumuşaktır (`is_active=false`); `GET /zones` yalnızca aktifleri döner. */
+  is_active: boolean
 }
 
-export type ZoneCreate = Omit<Zone, 'id'>
+export type ZoneCreate = Omit<Zone, 'id' | 'is_active'>
 
 export type ZoneUpdate = Partial<ZoneCreate>

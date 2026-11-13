@@ -2,7 +2,7 @@ import { cameraFrameUrl } from '@/api/cameras'
 import { Badge } from '@/components/ui/Badge'
 import { severityTones } from '@/components/ui/badgeTones'
 import { cn } from '@/lib/cn'
-import { cameraCode, eventTypeLabels, severityLabels } from '@/lib/labels'
+import { cameraCode, eventTypeLabel, severityLabels } from '@/lib/labels'
 import type { Camera } from '@/types'
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -115,7 +115,7 @@ export function CameraTile({
       {highlight && (
         <div className="absolute right-3 bottom-2.5">
           <Badge size="lg" tone={severityTones[highlight.event.severity]}>
-            {eventTypeLabels[highlight.event.type]}
+            {eventTypeLabel(highlight.event.type)}
             {highlight.others > 0 && ` +${highlight.others}`}
           </Badge>
         </div>
@@ -143,7 +143,7 @@ export function CameraTile({
   const { event, others } = highlight
   const label =
     `${code} ${camera.name}${filterNote}: ` +
-    `${eventTypeLabels[event.type]}, ${severityLabels[event.severity]}` +
+    `${eventTypeLabel(event.type)}, ${severityLabels[event.severity]}` +
     (others > 0 ? `, ${others} açık olay daha` : '') +
     '. Olayı aç.'
 

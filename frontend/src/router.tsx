@@ -1,6 +1,9 @@
 import { AppShell } from '@/components/layout/AppShell'
 import { RequireAuth } from '@/features/auth/RequireAuth'
 import { LoginPage } from '@/features/auth/LoginPage'
+import { AuditPage } from '@/features/admin/AuditPage'
+import { CamerasZonesPage } from '@/features/admin/CamerasZonesPage'
+import { UsersPage } from '@/features/admin/UsersPage'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { createBrowserRouter } from 'react-router-dom'
 import { EventDetailPage } from '@/features/events/EventDetailPage'
@@ -40,10 +43,10 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: '/admin/cameras',
-                element: <PlaceholderPage title="Kameralar ve bölgeler" />,
+                element: <CamerasZonesPage />,
               },
-              { path: '/admin/users', element: <PlaceholderPage title="Kullanıcılar" /> },
-              { path: '/admin/audit', element: <PlaceholderPage title="Denetim kayıtları" /> },
+              { path: '/admin/users', element: <UsersPage /> },
+              { path: '/admin/audit', element: <AuditPage /> },
             ],
           },
           // Bilinmeyen adres de korumalı: girişsiz kullanıcı 404 yerine giriş ekranını görür.

@@ -3,7 +3,7 @@ import { SeverityBadge, StatusBadge } from '@/components/ui/Badge'
 import { LinkButton } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { formatEventTime } from '@/lib/format'
-import { cameraCode, eventCode, eventTypeLabels } from '@/lib/labels'
+import { cameraCode, eventCode, eventTypeLabel } from '@/lib/labels'
 import type { AnomalyEvent } from '@/types'
 import { useState } from 'react'
 
@@ -16,7 +16,7 @@ interface EventListItemProps {
 /** Olaylar listesindeki tek kart: küçük görüntü, önem, saat, tür, kamera ve "İncele". */
 export function EventListItem({ event, cameraName }: EventListItemProps) {
   const [imageFailed, setImageFailed] = useState(false)
-  const type = eventTypeLabels[event.type]
+  const type = eventTypeLabel(event.type)
   const camera = cameraName
     ? `${cameraCode(event.camera_id)} · ${cameraName}`
     : cameraCode(event.camera_id)

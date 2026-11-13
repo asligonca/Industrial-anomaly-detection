@@ -9,17 +9,29 @@ import { Navigate } from 'react-router-dom'
 import { startSession } from './session'
 import { loginErrorMessage, useLogin } from './useLogin'
 
-const tabs: { role: Role; label: string; username: string; submitLabel: string }[] = [
+/** Demo hesapları backend seed'iyle aynı (parola kuralı en az 8 karakter). */
+const tabs: {
+  role: Role
+  label: string
+  username: string
+  password: string
+  submitLabel: string
+}[] = [
   {
     role: 'operator',
     label: 'Operatör',
     username: 'operator1',
+    password: 'operator1234',
     submitLabel: 'Operatör olarak giriş yap',
   },
-  { role: 'admin', label: 'Admin', username: 'admin', submitLabel: 'Admin olarak giriş yap' },
+  {
+    role: 'admin',
+    label: 'Admin',
+    username: 'admin',
+    password: 'admin1234',
+    submitLabel: 'Admin olarak giriş yap',
+  },
 ]
-
-const DEMO_PASSWORD = '1234'
 
 type Tab = (typeof tabs)[number]
 
@@ -30,7 +42,7 @@ export function LoginPage() {
     () => tabs.find((t) => t.role === useAuthStore.getState().lastRole) ?? tabs[0]!,
   )
   const [username, setUsername] = useState(tab.username)
-  const [password, setPassword] = useState(DEMO_PASSWORD)
+  const [password, setPassword] = useState(tab.password)
   const login = useLogin()
 
   // Zaten girişli kullanıcı (ya da giriş az önce başarılı oldu): ana ekrana.
@@ -39,7 +51,7 @@ export function LoginPage() {
   function selectTab(next: Tab) {
     setTab(next)
     setUsername(next.username)
-    setPassword(DEMO_PASSWORD)
+    setPassword(next.password)
     login.reset()
   }
 

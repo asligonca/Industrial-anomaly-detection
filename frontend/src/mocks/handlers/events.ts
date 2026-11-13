@@ -1,20 +1,19 @@
-import {
-  cameraCode,
-  eventCode,
-  eventStatuses,
-  eventTypeLabels,
-  eventTypeStatLabels,
-  eventTypes,
-} from '@/lib/labels'
-import type { AnomalyEvent, EventDetail, EventStatus, EventType, Paginated } from '@/types'
+import { cameraCode, eventCode, eventStatuses, eventTypes } from '@/lib/labels'
+import type { AnomalyEvent, EventDetail, EventStatus, EventType } from '@/types'
 import { http, HttpResponse } from 'msw'
 import { buildEventAnalysis } from '../analysis'
 import { db, setEventStatus } from '../db'
 import { buildEventStats } from '../stats'
-import { apiPath, authed, errorResponse, invalidBody, readJsonObject } from '../utils'
+import {
+  apiPath,
+  authed,
+  errorResponse,
+  invalidBody,
+  paginate,
+  readJsonObject,
+  readPage,
+} from '../utils'
 
-const DEFAULT_LIMIT = 50
-const MAX_LIMIT = 200
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
 /** Mock'taki tüm tespitler aynı modelden geliyor sayılır. */
 const MODEL_VERSION = 'yolo26n-exp1'
@@ -28,11 +27,6 @@ function parseDate(value: string, endOfDay: boolean): Date | null {
 }
 
 /** Negatif olmayan tam sayı; parametre yoksa varsayılan, geçersizse null. */
-function parseCount(value: string | null, fallback: number): number | null {
-  if (value === null) return fallback
-  return /^\d+$/.test(value) ? Number(value) : null
-}
-
 /** `from`/`to` çözülmüş hali; null = o yönde sınır yok. */
 interface DateBounds {
   from: Date | null
@@ -59,8 +53,8 @@ const inRange =
 const normalize = (text: string) => text.toLocaleLowerCase('tr-TR')
 
 /**
- * `?q=` araması: olay no, kamera kodu/adı, tür kodu ya da Türkçe adı içinde geçiyorsa eşleşir.
- * (Gerçek backend'e öneri; Türkçe tür adlarını backend de bilmeli ya da frontend koda çevirmeli.)
+ * `?q=` araması, backend kararıyla aynı: olay kodu (OLY-014 ya da 14), kamera adı ve kamera kodu.
+ * Türkçe tür adları backend'de yok; arayüz onları `type` parametresine çevirir (`recordsFilters`).
  */
 function matchesQuery(event: AnomalyEvent, query: string): boolean {
   const camera = db.cameras.find((c) => c.id === event.camera_id)
@@ -69,9 +63,6 @@ function matchesQuery(event: AnomalyEvent, query: string): boolean {
     String(event.id),
     cameraCode(event.camera_id),
     camera?.name ?? '',
-    event.type,
-    eventTypeLabels[event.type],
-    eventTypeStatLabels[event.type],
   ]
   return haystack.some((text) => normalize(text).includes(query))
 }
@@ -106,11 +97,8 @@ export const eventHandlers = [
     apiPath('/events'),
     authed(({ request }) => {
       const params = new URL(request.url).searchParams
-      const limit = parseCount(params.get('limit'), DEFAULT_LIMIT)
-      const offset = parseCount(params.get('offset'), 0)
-      if (limit === null || limit < 1 || limit > MAX_LIMIT || offset === null) {
-        return errorResponse(422, `limit must be 1–${MAX_LIMIT} and offset must be >= 0`)
-      }
+      const page = readPage(params)
+      if (page instanceof Response) return page
 
       const cameraId = params.get('camera_id')
       if (cameraId !== null && !/^\d+$/.test(cameraId)) {
@@ -138,13 +126,7 @@ export const eventHandlers = [
         .filter((e) => !query || matchesQuery(e, query))
         .sort((a, b) => b.created_at.localeCompare(a.created_at))
 
-      const body: Paginated<AnomalyEvent> = {
-        items: filtered.slice(offset, offset + limit),
-        total: filtered.length,
-        limit,
-        offset,
-      }
-      return HttpResponse.json(body)
+      return HttpResponse.json(paginate(filtered, page))
     }),
   ),
 

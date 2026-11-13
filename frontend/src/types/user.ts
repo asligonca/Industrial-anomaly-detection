@@ -11,6 +11,12 @@ export interface User {
   last_login_at: string | null
 }
 
+/** Giriş yanıtındaki ve oturumda saklanan kullanıcı: yalnızca kimlik ve rol. */
+export type SessionUser = Pick<User, 'id' | 'username' | 'role'>
+
+/** Başka kayıtların içinde geçen kullanıcı (denetim kaydı, alarm işlemi). */
+export type UserRef = Pick<User, 'id' | 'username'>
+
 export interface UserCreate {
   username: string
   password: string
@@ -27,6 +33,6 @@ export interface LoginRequest {
 export interface LoginResponse {
   access_token: string
   token_type: 'bearer'
-  /** Backend döndürmezse FE-3 bunu ayrı bir istekle alır. */
-  user: User
+  /** JWT içinde de `role` claim'i var. */
+  user: SessionUser
 }

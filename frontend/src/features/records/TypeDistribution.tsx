@@ -1,7 +1,7 @@
 import { cn } from '@/lib/cn'
-import { eventTypeStatLabels } from '@/lib/labels'
+import { eventTypeStatLabel } from '@/lib/labels'
 import type { EventStats } from '@/types'
-import { typeBarColors } from './chartColors'
+import { typeBarColor } from './chartColors'
 
 /** Türe göre dağılım: en çok görülen üstte, çubuk boyu en büyük değere oranlı. */
 export function TypeDistribution({ byType }: { byType: EventStats['by_type'] }) {
@@ -17,12 +17,12 @@ export function TypeDistribution({ byType }: { byType: EventStats['by_type'] }) 
       {rows.map((row) => (
         <li key={row.type} className="flex flex-col gap-1.5">
           <div className="flex justify-between gap-3 text-[13px]">
-            <span>{eventTypeStatLabels[row.type]}</span>
+            <span>{eventTypeStatLabel(row.type)}</span>
             <span className="text-zinc-500">{row.count}</span>
           </div>
           <div aria-hidden className="h-1.5 rounded-full bg-chart-track">
             <div
-              className={cn('h-1.5 rounded-full', typeBarColors[row.type])}
+              className={cn('h-1.5 rounded-full', typeBarColor(row.type))}
               style={{ width: `${Math.round((row.count / max) * 100)}%` }}
             />
           </div>

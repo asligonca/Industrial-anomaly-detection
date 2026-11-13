@@ -12,6 +12,7 @@ export const zones: Zone[] = [
       [0.55, 0.85],
     ],
     rule_type: 'restricted',
+    is_active: true,
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ export const zones: Zone[] = [
       [0.1, 0.95],
     ],
     rule_type: 'ppe_helmet_vest',
+    is_active: true,
   },
   {
     id: 3,
@@ -36,6 +38,7 @@ export const zones: Zone[] = [
       [0.3, 1],
     ],
     rule_type: 'forklift_proximity',
+    is_active: true,
   },
   {
     id: 4,
@@ -48,5 +51,6 @@ export const zones: Zone[] = [
       [0.05, 0.95],
     ],
     rule_type: 'ppe_vest',
+    is_active: true,
   },
 ]

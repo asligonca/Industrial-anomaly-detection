@@ -1,4 +1,4 @@
-import { eventCode, eventTypeLabels, isOpenStatus } from '@/lib/labels'
+import { eventCode, eventTypeLabel, isOpenStatus } from '@/lib/labels'
 import type { AnomalyEvent, AssistantResponse, User } from '@/types'
 import { http, HttpResponse } from 'msw'
 import { addAgentLog, db, setEventStatus } from '../db'
@@ -22,7 +22,7 @@ function respond(query: string, user: User): AssistantResponse {
     if (!event) return { answer: 'Kapatılacak açık olay yok.', actions: [] }
     setEventStatus(event, 'confirmed', user, 'Sesli asistan ile kapatıldı')
     return {
-      answer: `${eventCode(event.id)} kapatıldı (${eventTypeLabels[event.type]}, ${cameraName(event.camera_id)}).`,
+      answer: `${eventCode(event.id)} kapatıldı (${eventTypeLabel(event.type)}, ${cameraName(event.camera_id)}).`,
       actions: [{ type: 'acknowledge_alarm', event_id: event.id }],
     }
   }
@@ -49,7 +49,7 @@ function respond(query: string, user: User): AssistantResponse {
     const todays = db.events.filter((e) => isToday(e.created_at))
     const open = todays.filter(isOpen)
     const list = open
-      .map((e) => `${eventTypeLabels[e.type]} (${cameraName(e.camera_id)})`)
+      .map((e) => `${eventTypeLabel(e.type)} (${cameraName(e.camera_id)})`)
       .join(', ')
     return {
       answer: `Bugün ${todays.length} olay kaydedildi. ${open.length} tanesi açık${list ? `: ${list}` : ''}.`,

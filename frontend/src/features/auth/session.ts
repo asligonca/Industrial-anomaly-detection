@@ -2,10 +2,10 @@ import { setTokenProvider, setUnauthorizedHandler } from '@/api/client'
 import { queryClient } from '@/queryClient'
 import { useAuthStore } from '@/store/auth'
 import { useUiStore } from '@/store/ui'
-import type { User } from '@/types'
+import type { SessionUser } from '@/types'
 
 /** Giriş: önceki kullanıcıdan kalan önbellek yeni oturuma karışmasın diye temizlenir. */
-export function startSession(token: string, user: User) {
+export function startSession(token: string, user: SessionUser) {
   queryClient.clear()
   useAuthStore.getState().setSession(token, user)
 }

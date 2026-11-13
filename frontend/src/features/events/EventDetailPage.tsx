@@ -7,7 +7,7 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatConfidence } from '@/lib/format'
-import { cameraCode, eventCode, eventTypeLabels, isOpenStatus } from '@/lib/labels'
+import { cameraCode, eventCode, eventTypeLabel, isOpenStatus } from '@/lib/labels'
 import type { EventDetail } from '@/types'
 import { Link, useParams } from 'react-router-dom'
 import { AgentTimeline } from './AgentTimeline'
@@ -72,7 +72,7 @@ function MetaItem({ label, value }: { label: string; value: string }) {
 }
 
 function EventDetailView({ event, cameraName }: { event: EventDetail; cameraName?: string }) {
-  const type = eventTypeLabels[event.type]
+  const type = eventTypeLabel(event.type)
   const code = cameraCode(event.camera_id)
   const open = isOpenStatus(event.status)
 
