@@ -3,7 +3,7 @@ import type { Role, User } from '@/types'
 import { delay, HttpResponse, type DefaultBodyType, type PathParams, type StrictRequest } from 'msw'
 import { db } from './db'
 
-/** '/cameras' -> 'http://localhost:8000/cameras'. Handler'lar gerçek API adresini yakalar. */
+/** '/cameras' -> 'http://localhost:8000/api/cameras'. Handler'lar gerçek API adresini yakalar. */
 export const apiPath = (path: string) => `${apiBaseUrl()}${path}`
 
 /** Gerçek ağ gibi 200–400 ms gecikme. */

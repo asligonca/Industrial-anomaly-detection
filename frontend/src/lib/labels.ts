@@ -2,7 +2,7 @@
  * API kodu -> ekran etiketi. API'ye her zaman kod gider, ekrana her zaman etiket çıkar.
  * Backend kodları değiştirirse yalnızca bu dosya ve `src/types` güncellenir.
  */
-import type { EventStatus, EventType, Role, RuleType, Severity } from '@/types'
+import type { AgentName, EventStatus, EventType, Role, RuleType, Severity } from '@/types'
 
 export const eventTypeLabels: Record<EventType, string> = {
   restricted_zone: 'Yasak bölge',
@@ -55,6 +55,12 @@ export const eventStatuses = Object.keys(eventStatusLabels) as EventStatus[]
 export const OPEN_STATUSES: EventStatus[] = ['new', 'reviewing']
 
 export const isOpenStatus = (status: EventStatus) => OPEN_STATUSES.includes(status)
+
+export const agentLabels: Record<AgentName, string> = {
+  watcher: 'Gözcü Ajan',
+  regulation: 'İSG Mevzuat Ajanı',
+  coordinator: 'Koordinatör Ajan',
+}
 
 export const roleLabels: Record<Role, string> = {
   admin: 'Yönetici',

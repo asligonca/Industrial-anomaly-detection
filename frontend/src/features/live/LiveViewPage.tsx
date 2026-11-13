@@ -1,19 +1,16 @@
 import { useCameras } from '@/api/hooks/useCameras'
-import { useEvents } from '@/api/hooks/useEvents'
+import { useOpenEvents } from '@/api/hooks/useOpenEvents'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { FilterChips, type FilterOption } from '@/components/ui/FilterChips'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { cn } from '@/lib/cn'
-import { OPEN_STATUSES } from '@/lib/labels'
 import { useMemo, useState } from 'react'
 import { CameraTile } from './CameraTile'
 import { cameraGroups, cameraHighlights } from './cameraHighlights'
 
 const ALL = 'all'
-/** API'nin izin verdiği en büyük sayfa. Açık olay bundan fazlaysa eski olanlar vurgulanmaz. */
-const OPEN_EVENT_LIMIT = 200
 const SKELETON_COUNT = 6
 
 /** Geniş ekranda 3 sütun ve ilk kart 2×2; dar ekranda 2 sütun, hepsi eşit. */
@@ -23,7 +20,8 @@ const featuredClass = 'lg:col-span-2 lg:row-span-2'
 /** Ana ekran: kamera ızgarası, grup filtresi, açık olay vurgusu. */
 export function LiveViewPage() {
   const cameras = useCameras()
-  const openEvents = useEvents({ status: OPEN_STATUSES, limit: OPEN_EVENT_LIMIT })
+  // En yeni 200 açık olay; daha eskiler vurgulanmaz.
+  const openEvents = useOpenEvents()
   const [group, setGroup] = useState<string>(ALL)
 
   const groups = useMemo(() => cameraGroups(cameras.data ?? []), [cameras.data])

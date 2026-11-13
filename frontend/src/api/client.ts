@@ -56,6 +56,19 @@ interface RequestOptions {
 /** Sondaki "/" atılmış API taban adresi. Mock handler'ları da bunu kullanır. */
 export const apiBaseUrl = () => config.apiUrl.replace(/\/$/, '')
 
+/**
+ * `<img>` gibi başlık gönderemeyen istekler için adrese `?token=<JWT>` ekler (WebSocket ile aynı
+ * yöntem). Göreli adres API tabanına göre çözülür: '/api/events/14/snapshot' ya da tam adres.
+ * Oturum yoksa adres token'sız döner (backend 401 verir, görüntü yüklenmez).
+ */
+export function withToken(url: string): string {
+  const base = new URL(`${apiBaseUrl()}/`, window.location.href)
+  const resolved = new URL(url, base)
+  const token = getToken()
+  if (token) resolved.searchParams.set('token', token)
+  return resolved.href
+}
+
 function buildUrl(path: string, query?: QueryParams): string {
   const url = `${apiBaseUrl()}${path}`
   if (!query) return url

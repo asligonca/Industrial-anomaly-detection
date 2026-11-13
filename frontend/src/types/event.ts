@@ -15,7 +15,7 @@ export type Severity = 'critical' | 'high' | 'medium' | 'info'
 /** `reviewing` FE-12 (#25) önerisi. `confirmed` ekranda "Kapandı" olarak görünür. */
 export type EventStatus = 'new' | 'reviewing' | 'confirmed' | 'false_alarm'
 
-/** Normalize kutu: [x, y, w, h], hepsi 0–1 arası. */
+/** Tespit kutusu: [x1, y1, x2, y2] (sol üst ve sağ alt köşe), görüntüye göre 0–1 arası. */
 export type BBox = [number, number, number, number]
 
 /** `anomaly_events` tablosunun Read şeması. */
@@ -27,10 +27,26 @@ export interface AnomalyEvent {
   confidence: number
   severity: Severity
   bbox: BBox
+  /** Sunucudaki dosya yolu (tablo sütunu). Ekranda kullanılmaz. */
   snapshot_path: string
+  /** Görüntünün adresi. `<img>` için `eventSnapshotUrl` ile token eklenir. */
+  snapshot_url: string
   track_id: number
   status: EventStatus
   created_at: string
+}
+
+/** Olay detayındaki bölge özeti. */
+export interface EventZoneRef {
+  id: number
+  name: string
+}
+
+/** `GET /events/{id}` yanıtı: liste kaydı + bölge adı ve tespit modeli sürümü. */
+export interface EventDetail extends AnomalyEvent {
+  zone: EventZoneRef | null
+  /** Örn. "yolo26n-exp1" */
+  model_version: string
 }
 
 /**

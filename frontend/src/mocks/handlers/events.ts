@@ -1,6 +1,7 @@
 import { eventStatuses, eventTypes } from '@/lib/labels'
-import type { AnomalyEvent, EventStatus, EventType, Paginated } from '@/types'
+import type { AnomalyEvent, EventDetail, EventStatus, EventType, Paginated } from '@/types'
 import { http, HttpResponse } from 'msw'
+import { buildEventAnalysis } from '../analysis'
 import { eventStats } from '../data/stats'
 import { db, setEventStatus } from '../db'
 import { apiPath, authed, errorResponse, invalidBody, readJsonObject } from '../utils'
@@ -8,6 +9,8 @@ import { apiPath, authed, errorResponse, invalidBody, readJsonObject } from '../
 const DEFAULT_LIMIT = 50
 const MAX_LIMIT = 200
 const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/
+/** Mock'taki tüm tespitler aynı modelden geliyor sayılır. */
+const MODEL_VERSION = 'yolo26n-exp1'
 
 /** "2026-11-03" gibi yalnızca-tarih değerlerde `to` o günün sonunu kapsar. */
 function parseDate(value: string, endOfDay: boolean): Date | null {
@@ -23,6 +26,22 @@ function parseCount(value: string | null, fallback: number): number | null {
   return /^\d+$/.test(value) ? Number(value) : null
 }
 
+/** Yoldaki id: tam sayı değilse 422, olay yoksa 404. */
+function findEvent(rawId: string): AnomalyEvent | Response {
+  if (!/^\d+$/.test(rawId)) return errorResponse(422, 'id must be an integer')
+  return db.events.find((e) => e.id === Number(rawId)) ?? errorResponse(404, 'Event not found')
+}
+
+function toDetail(event: AnomalyEvent): EventDetail {
+  const zone = db.zones.find((z) => z.id === event.zone_id)
+  return {
+    ...event,
+    zone: zone ? { id: zone.id, name: zone.name } : null,
+    model_version: MODEL_VERSION,
+  }
+}
+
+// Sıra önemli: '/events/stats', '/events/:id'den önce gelmeli ("stats" id sanılmasın).
 export const eventHandlers = [
   http.get(
     apiPath('/events/stats'),
@@ -77,18 +96,34 @@ export const eventHandlers = [
     }),
   ),
 
+  http.get<{ id: string }>(
+    apiPath('/events/:id'),
+    authed<{ id: string }>(({ params }) => {
+      const event = findEvent(params.id)
+      return event instanceof Response ? event : HttpResponse.json(toDetail(event))
+    }),
+  ),
+
+  http.get<{ id: string }>(
+    apiPath('/events/:id/analysis'),
+    authed<{ id: string }>(({ params }) => {
+      const event = findEvent(params.id)
+      return event instanceof Response ? event : HttpResponse.json(buildEventAnalysis(event))
+    }),
+  ),
+
   http.patch<{ id: string }>(
     apiPath('/events/:id/status'),
     authed<{ id: string }>(async ({ request, params, user }) => {
-      const event = db.events.find((e) => e.id === Number(params.id))
-      if (!event) return errorResponse(404, 'Event not found')
+      const event = findEvent(params.id)
+      if (event instanceof Response) return event
 
       const body = await readJsonObject(request)
       if (!body) return invalidBody()
       if (!eventStatuses.includes(body.status as EventStatus)) {
         return errorResponse(422, `status must be one of: ${eventStatuses.join(', ')}`)
       }
-      const note = typeof body.note === 'string' ? body.note : null
+      const note = typeof body.note === 'string' && body.note.trim() ? body.note.trim() : null
       return HttpResponse.json(setEventStatus(event, body.status as EventStatus, user, note))
     }),
   ),
