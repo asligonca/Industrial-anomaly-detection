@@ -24,9 +24,14 @@ Frontend ile API sözleşmesi: GitHub issue #25 (FE-12).
 - Liste uçları `{"items": [...], "total": n}` döner. Tarihler UTC, ISO 8601.
 - Alan adları snake_case. Kamera ve bölge silme = soft delete (`is_active = False`).
 
-## Alınan kararlar (#25)
-- Olay `status`: new, reviewing, confirmed, false_alarm
+## Alınan kararlar (#25 — ayrıntı: docs/SPRINT_PLAN.md "API sözleşmesi")
+- REST uçları `/api` önekiyle. Durum değişikliği: `PATCH /api/events/{id}/status` `{status, note?}`
+- Olay `status`: new, reviewing, confirmed, false_alarm. Geçişler: new → reviewing|confirmed|false_alarm; reviewing → new|confirmed|false_alarm; confirmed/false_alarm → reviewing; diğerleri 409.
 - Olay `severity`: critical, high, medium, info. Backend `type`'tan doldurur.
-- `cameras.area`: serbest metin, String(50)
-- `users.last_login_at` var. Olay kodu (`OLY-014`) DB'de tutulmaz, yanıtta `id`'den üretilir.
-- WS mesajı: `{"type": "event.created" | "event.updated", "data": ...}`
+- `AnomalyEvent` ayrıca `model_version` tutar; `bbox` = `[x1, y1, x2, y2]`, 0–1 normalize.
+- `AlarmAction`: event_id, user_id, from_status, to_status, note, created_at.
+- `cameras.area`: serbest metin, String(50). `users.last_login_at` var.
+- Olay `code` (`OLY-014`) ve `snapshot_url` DB'de tutulmaz, yanıtta üretilir.
+- Liste öğesinde `camera: {id, name, area}`; ilişkiler `selectinload` ile yüklenir (N+1 yok).
+- WS mesajı: `{"type": "event.created" | "event.updated", "data": ...}`. WS ve görüntülerde JWT `?token=` ile.
+- SQLite naive datetime döndürür; yanıtta tarihler UTC `Z` ile verilir.
