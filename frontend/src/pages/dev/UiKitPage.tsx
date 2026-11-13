@@ -5,7 +5,9 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { FilterChips } from '@/components/ui/FilterChips'
 import { Input } from '@/components/ui/Input'
+import { inputClass } from '@/components/ui/inputStyles'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { Pagination } from '@/components/ui/Pagination'
 import { Skeleton } from '@/components/ui/Skeleton'
 import type { EventStatus, Severity } from '@/types'
 import { useState, type ReactNode } from 'react'
@@ -23,6 +25,11 @@ function FilterChipsDemo() {
   return (
     <FilterChips label="Örnek filtre" options={groupOptions} value={value} onChange={setValue} />
   )
+}
+
+function PaginationDemo() {
+  const [page, setPage] = useState(1)
+  return <Pagination page={page} pageSize={20} total={57} onPageChange={setPage} />
 }
 
 function Block({ title, children }: { title: string; children: ReactNode }) {
@@ -122,6 +129,22 @@ export function UiKitPage() {
           <Input label="Kullanıcı adı" defaultValue="operator1" />
           <Input label="Parola" type="password" error="Parola en az 4 karakter olmalı." />
         </div>
+        {/* Etiketi görünmeyen alanlar (arama, not, tarih) `Input` yerine `inputClass` kullanır. */}
+        <div className="flex flex-wrap items-center gap-3">
+          <input aria-label="Örnek lg" placeholder="lg (Input)" className={inputClass('lg')} />
+          <input aria-label="Örnek md" placeholder="md (arama, not)" className={inputClass('md')} />
+          <input aria-label="Örnek sm" type="date" className={inputClass('sm', 'font-mono')} />
+          <input
+            aria-label="Örnek devre dışı"
+            placeholder="Devre dışı"
+            disabled
+            className={inputClass('md')}
+          />
+        </div>
+      </Block>
+
+      <Block title="Sayfalama">
+        <PaginationDemo />
       </Block>
 
       <Block title="Yükleniyor, hata, boş durum">

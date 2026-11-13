@@ -34,8 +34,22 @@
   --color-status-closed-ink: #52525b;
   --color-status-closed-dot: #71717a;
 
-  /* Kamera kartındaki "KAM-01" kodu (koyu görüntü üstünde) */
+  /* Kamera kartındaki "KAM-01" kodu (koyu görüntü üstünde) ve beyaz zemindeki hali (tablo) */
   --color-camera-code: #fbbf24;
+  --color-camera-code-ink: #a16207;
+
+  /* Grafik: saatlik tespit sütunu, şimdiki saat sütunu ve türe göre dağılım çubukları */
+  --color-chart-bar: #52525b;
+  --color-chart-bar-current: #f5a524;
+  --color-chart-track: #e4e4e7;
+  --color-chart-no-helmet: #f5a524;
+  --color-chart-no-vest: #fbbf24;
+  --color-chart-forklift: #fb923c;
+  --color-chart-restricted: #d92d33;
+  --color-chart-visitor: #71717a;
+  --color-chart-face-shield: #fcd34d;
+  --color-chart-smoke: #a1a1aa;
+  --color-chart-equipment: #fdba74;
 
   /* Yarıçap: rozet 5, alan/düğme 10, kart 16, giriş kartı gibi büyük yüzey 20 */
   --radius-badge: 5px;

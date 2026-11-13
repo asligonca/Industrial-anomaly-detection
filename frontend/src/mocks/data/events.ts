@@ -1,9 +1,10 @@
 import { publicAssetUrl } from '@/lib/publicAssetUrl'
 import type { AnomalyEvent } from '@/types'
-import { today } from './time'
+import { atDay, today } from './time'
 
 // Mock'ta olay görseli, kameranın public/assets altındaki karesidir.
 // bbox: [x1, y1, x2, y2], görüntüye göre 0–1 arası. Açık olaylarınki karedeki çizili kutuyla örtüşür.
+// 14–5 bugünün olayları; 4–1 önceki günlerden kapanmış kayıtlar (Kayıtlar ekranı ve tarih filtresi için).
 
 export const events: AnomalyEvent[] = [
   {
@@ -145,5 +146,61 @@ export const events: AnomalyEvent[] = [
     track_id: 291,
     status: 'confirmed',
     created_at: today('09:03:55'),
+  },
+  {
+    id: 4,
+    camera_id: 1,
+    zone_id: 2,
+    type: 'no_vest',
+    confidence: 0.84,
+    severity: 'medium',
+    bbox: [0.4, 0.3, 0.5, 0.8],
+    snapshot_path: 'assets/cam-1.png',
+    snapshot_url: publicAssetUrl('assets/cam-1.png'),
+    track_id: 233,
+    status: 'confirmed',
+    created_at: atDay(1, '16:44:09'),
+  },
+  {
+    id: 3,
+    camera_id: 3,
+    zone_id: 1,
+    type: 'restricted_zone',
+    confidence: 0.9,
+    severity: 'critical',
+    bbox: [0.7, 0.3, 0.8, 0.95],
+    snapshot_path: 'assets/cam-3.png',
+    snapshot_url: publicAssetUrl('assets/cam-3.png'),
+    track_id: 198,
+    status: 'confirmed',
+    created_at: atDay(1, '08:15:52'),
+  },
+  {
+    id: 2,
+    camera_id: 2,
+    zone_id: 3,
+    type: 'forklift_proximity',
+    confidence: 0.76,
+    severity: 'high',
+    bbox: [0.3, 0.4, 0.45, 0.9],
+    snapshot_path: 'assets/cam-2.png',
+    snapshot_url: publicAssetUrl('assets/cam-2.png'),
+    track_id: 151,
+    status: 'false_alarm',
+    created_at: atDay(2, '14:27:30'),
+  },
+  {
+    id: 1,
+    camera_id: 4,
+    zone_id: 4,
+    type: 'no_helmet',
+    confidence: 0.89,
+    severity: 'high',
+    bbox: [0.25, 0.4, 0.35, 0.8],
+    snapshot_path: 'assets/cam-4.png',
+    snapshot_url: publicAssetUrl('assets/cam-4.png'),
+    track_id: 102,
+    status: 'confirmed',
+    created_at: atDay(3, '11:05:14'),
   },
 ]

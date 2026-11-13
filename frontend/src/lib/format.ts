@@ -1,11 +1,23 @@
-const pad = (n: number) => String(n).padStart(2, '0')
+/** Bir gündeki saat sayısı: saatlik grafik ve `by_hour` her zaman bu kadar kayıt. */
+export const HOURS_PER_DAY = 24
 
-const formatDay = (date: Date) =>
-  `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`
+/** 7 -> "07" (saat, dakika, gün, ay). */
+export const twoDigits = (n: number) => String(n).padStart(2, '0')
+
+/** Yerel tarihle "GG.AA.YYYY" (03.11.2026). */
+export const formatDay = (date: Date) =>
+  `${twoDigits(date.getDate())}.${twoDigits(date.getMonth() + 1)}.${date.getFullYear()}`
+
+/** Yerel tarihle "YYYY-MM-DD": `<input type="date">` değeri ve adres çubuğundaki tarih. */
+export const toDateInputValue = (date: Date) =>
+  `${date.getFullYear()}-${twoDigits(date.getMonth() + 1)}-${twoDigits(date.getDate())}`
+
+/** İki an aynı yerel günde mi? */
+export const isSameDay = (a: Date, b: Date) => toDateInputValue(a) === toDateInputValue(b)
 
 /** Yerel saatle "SS:DD:SS" (13:02:17). */
 export function formatTime(date: Date): string {
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+  return `${twoDigits(date.getHours())}:${twoDigits(date.getMinutes())}:${twoDigits(date.getSeconds())}`
 }
 
 /** Yerel saatle "GG.AA.YYYY SS:DD:SS" (03.11.2026 13:02:17). */
@@ -15,7 +27,7 @@ export function formatDateTime(date: Date): string {
 
 /** Bugünse yalnızca saat, değilse tarih + saat. Olay listesi gibi çoğu kaydı bugün olan yerler için. */
 export function formatEventTime(date: Date, now: Date = new Date()): string {
-  return formatDay(date) === formatDay(now) ? formatTime(date) : formatDateTime(date)
+  return isSameDay(date, now) ? formatTime(date) : formatDateTime(date)
 }
 
 /** Model güven skoru, tasarımdaki gibi iki ondalık: 0.912 -> "0,91". */

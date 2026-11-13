@@ -84,6 +84,33 @@ export function eventCategory(type: EventType): EventCategory {
   return 'other'
 }
 
+export const eventCategories = Object.keys(eventCategoryLabels) as EventCategory[]
+
+/** Kategorinin kapsadığı türler. API'ye `?type=` olarak bunlar gider. */
+export function eventCategoryTypes(category: EventCategory): EventType[] {
+  return eventTypes.filter((type) => eventCategory(type) === category)
+}
+
+/** Durum değiştirme düğmesi: hedef durum ve düğme yazısı. */
+export interface StatusAction {
+  status: EventStatus
+  label: string
+}
+
+/**
+ * Açık olayda yapılabilecek durum değişiklikleri, sırası ekrandaki gibi. Kapanmış olayda boş:
+ * olay yeniden açılmaz. Olay detayı ve Kayıtlar tablosu aynı listeyi kullanır.
+ */
+export function statusActionsFor(status: EventStatus): StatusAction[] {
+  const close: StatusAction[] = [
+    { status: 'false_alarm', label: 'Yanlış alarm' },
+    { status: 'confirmed', label: 'Olayı kapat' },
+  ]
+  if (status === 'new') return [{ status: 'reviewing', label: 'Üstlen' }, ...close]
+  if (status === 'reviewing') return close
+  return []
+}
+
 /** 14 -> "OLY-014" */
 export function eventCode(id: number): string {
   return `OLY-${String(id).padStart(3, '0')}`

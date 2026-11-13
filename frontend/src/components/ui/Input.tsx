@@ -1,5 +1,6 @@
 import { cn } from '@/lib/cn'
 import { useId, type ComponentProps } from 'react'
+import { inputClass } from './inputStyles'
 
 interface InputProps extends ComponentProps<'input'> {
   label: string
@@ -17,7 +18,7 @@ export function Input({ label, error, className, ...rest }: InputProps) {
         <input
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
-          className="h-11 rounded-control border border-zinc-300 bg-white px-3.5 text-[15px] text-zinc-900 focus-visible:border-zinc-900 aria-[invalid=true]:border-danger"
+          className={inputClass('lg')}
           {...rest}
         />
       </label>

@@ -1,6 +1,7 @@
 import { useUpdateEventStatus } from '@/api/hooks/useUpdateEventStatus'
 import { Button } from '@/components/ui/Button'
-import { isOpenStatus } from '@/lib/labels'
+import { inputClass } from '@/components/ui/inputStyles'
+import { isOpenStatus, statusActionsFor } from '@/lib/labels'
 import type { AnomalyEvent, EventStatus } from '@/types'
 import { useState } from 'react'
 
@@ -40,29 +41,20 @@ export function EventStatusActions({ event }: { event: AnomalyEvent }) {
           placeholder="Not (isteğe bağlı)"
           aria-label="Durum notu (isteğe bağlı)"
           disabled={update.isPending}
-          className="h-[42px] w-full rounded-control border border-zinc-300 bg-white px-3.5 text-sm text-zinc-900 focus-visible:border-zinc-900 disabled:opacity-60 sm:w-56"
+          className={inputClass('md', 'w-full sm:w-56')}
         />
-        {event.status === 'new' && (
+        {statusActionsFor(event.status).map((action) => (
           <Button
-            variant="secondary"
+            key={action.status}
+            // Asıl eylem (kapatmak) koyu, diğerleri çerçeveli.
+            variant={action.status === 'confirmed' ? 'primary' : 'secondary'}
             size="md"
             disabled={update.isPending}
-            onClick={() => submit('reviewing')}
+            onClick={() => submit(action.status)}
           >
-            {label('reviewing', 'Üstlen')}
+            {label(action.status, action.label)}
           </Button>
-        )}
-        <Button
-          variant="secondary"
-          size="md"
-          disabled={update.isPending}
-          onClick={() => submit('false_alarm')}
-        >
-          {label('false_alarm', 'Yanlış alarm')}
-        </Button>
-        <Button size="md" disabled={update.isPending} onClick={() => submit('confirmed')}>
-          {label('confirmed', 'Olayı kapat')}
-        </Button>
+        ))}
       </div>
       {update.isError && (
         <p role="alert" className="text-[13px] text-danger">

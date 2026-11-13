@@ -51,13 +51,19 @@ export interface EventDetail extends AnomalyEvent {
 
 /**
  * `GET /events` sorgu parametreleri. Tarihler ISO string ya da YYYY-MM-DD.
- * `status` dizi olursa tekrarlı parametre gider: `?status=new&status=reviewing`.
+ * `status` ve `type` dizi olursa tekrarlı parametre gider: `?status=new&status=reviewing`.
  * (`type` takma adı bilerek: interface'ler `Record` olarak kullanılamaz.)
  */
 export type EventFilters = {
   camera_id?: number
-  type?: EventType
+  /** Dizi hali FE-12 (#25) önerisi ("Diğer" kategorisi birden çok türü kapsar). */
+  type?: EventType | EventType[]
   status?: EventStatus | EventStatus[]
+  /**
+   * Serbest metin arama: olay no (OLY-014 ya da 14), kamera adı/kodu, tür adı ya da kodu.
+   * FE-12 (#25) önerisi.
+   */
+  q?: string
   from?: string
   to?: string
   limit?: number
@@ -87,6 +93,6 @@ export interface EventStats {
   by_camera: { camera_id: number; count: number }[]
   /** date: YYYY-MM-DD */
   by_day: { date: string; count: number }[]
-  /** hour: 0–23 */
+  /** hour: 0–23, tesisin yerel saati. 24 kayıt, tespit olmayan saat 0. */
   by_hour: { hour: number; count: number }[]
 }

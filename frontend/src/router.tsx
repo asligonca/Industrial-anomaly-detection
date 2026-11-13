@@ -6,6 +6,7 @@ import { createBrowserRouter } from 'react-router-dom'
 import { EventDetailPage } from '@/features/events/EventDetailPage'
 import { EventsPage } from '@/features/events/EventsPage'
 import { LiveViewPage } from '@/features/live/LiveViewPage'
+import { LazyRecordsPage } from '@/features/records/LazyRecordsPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
 import { PlaceholderPage } from '@/pages/PlaceholderPage'
 
@@ -31,7 +32,7 @@ export const router = createBrowserRouter([
           { path: '/', element: <LiveViewPage /> },
           { path: '/events', element: <EventsPage /> },
           { path: '/events/:id', element: <EventDetailPage /> },
-          { path: '/records', element: <PlaceholderPage title="Kayıtlar" /> },
+          { path: '/records', element: <LazyRecordsPage /> },
           { path: '/agents', element: <PlaceholderPage title="Ajan akışı" /> },
           {
             // Yalnızca admin.
