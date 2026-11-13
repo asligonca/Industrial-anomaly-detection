@@ -8,6 +8,9 @@ Frontend ile API sözleşmesi: GitHub issue #25 (FE-12).
 - Komutlar `backend/` içinde, venv aktifken çalışır: `.venv\Scripts\activate`
 - Sunucu: `uvicorn app.main:app --reload`
 - Python 3.13, paket sürümleri `requirements.txt`'te sabit
+- Branch çektikten sonra: `pip install -r requirements.txt` ve `alembic upgrade head`
+- Yeni migration: `alembic revision --autogenerate -m "..."` → dosyayı gözden geçir → `alembic upgrade head`. Kontrol: `alembic current`
+- Alembic adresi `env.py`'de `settings.database_url`'den gelir (`alembic.ini`'deki değil); SQLite'ta `render_as_batch` açık
 
 ## Kurallar
 - Sadece `backend/` altındaki dosyaları değiştir. `frontend/`, `ml/`, kök dosyalara dokunma.

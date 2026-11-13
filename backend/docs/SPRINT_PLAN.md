@@ -53,9 +53,9 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [x] Branch: `feature/db-models`
 - [x] `app/db/base.py` (Base, naming convention) ve `app/db/session.py` (engine, SessionLocal, `get_db`, SQLite foreign key)
 - [x] Enum'lar + `User`, `Camera`, `Zone` modelleri
-- [ ] `AnomalyEvent`, `AlarmAction` modelleri
-- [ ] `anomaly_events` tablosunda `(camera_id, created_at)` bileşik index + `status` index (küçük tablolarda index yok, foreign key sütunlarında var)
-- [ ] **Alembic** kurulumu + ilk migration; şema değişikliği hep migration ile
+- [x] `AnomalyEvent`, `AlarmAction` modelleri
+- [x] `anomaly_events` tablosunda `(camera_id, created_at)` bileşik index + `status` index (küçük tablolarda index yok, foreign key sütunlarında var)
+- [x] **Alembic** kurulumu + ilk migration; şema değişikliği hep migration ile
 - [ ] PR (açıklamaya `Closes #25` değil, `Refs #25` — sözleşmenin tamamı bu PR'da bitmiyor)
 
 ### 2. hafta — şemalar ve uçlar

@@ -20,6 +20,20 @@ class EventSeverity(StrEnum):
     info = "info"
 
 
+class EventType(StrEnum):
+    no_helmet = "no_helmet"
+    no_vest = "no_vest"
+    restricted_zone = "restricted_zone"
+
+
+
+EVENT_TYPE_SEVERITY: dict[EventType, EventSeverity] = {
+    EventType.restricted_zone: EventSeverity.critical,
+    EventType.no_helmet: EventSeverity.high,
+    EventType.no_vest: EventSeverity.medium,
+}
+
+
 class ZoneRuleType(StrEnum):
     restricted = "restricted"
     ppe_helmet_vest = "ppe_helmet_vest"
