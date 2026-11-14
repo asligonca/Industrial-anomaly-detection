@@ -1,21 +1,21 @@
 import { useUpdateEventStatus } from '@/api/hooks/useUpdateEventStatus'
 import { Button } from '@/components/ui/Button'
 import { inputClass } from '@/components/ui/inputStyles'
-import { isOpenStatus, statusActionsFor } from '@/lib/labels'
+import { isConflict } from '@/api/client'
+import { statusActionsFor } from '@/lib/eventRules'
 import type { AnomalyEvent, EventStatus } from '@/types'
 import { useState } from 'react'
 
 const NOTE_MAX_LENGTH = 500
 
 /**
- * Olay durumunu değiştiren düğmeler ve isteğe bağlı not. Olay kapanınca hiç görünmez.
- * Üstlen: Açık -> İnceleniyor. Yanlış alarm ve Olayı kapat: tek tık, onay sorulmaz.
+ * Olay durumunu değiştiren düğmeler ve isteğe bağlı not (backend geçiş kuralları):
+ * Açık: Üstlen / Yanlış alarm / Olayı kapat. İnceleniyor: İncelemeyi bırak / Yanlış alarm /
+ * Olayı kapat. Kapanmış: Yeniden aç (-> İnceleniyor). Tek tık, onay sorulmaz.
  */
 export function EventStatusActions({ event }: { event: AnomalyEvent }) {
   const update = useUpdateEventStatus()
   const [note, setNote] = useState('')
-
-  if (!isOpenStatus(event.status)) return null
 
   const pendingStatus = update.isPending ? update.variables.status : null
 
@@ -58,7 +58,9 @@ export function EventStatusActions({ event }: { event: AnomalyEvent }) {
       </div>
       {update.isError && (
         <p role="alert" className="text-[13px] text-danger">
-          Durum güncellenemedi: {update.error.message}
+          {isConflict(update.error)
+            ? 'Olayın durumu bu arada değişmiş; sayfa güncellendi.'
+            : `Durum güncellenemedi: ${update.error.message}`}
         </p>
       )}
     </div>

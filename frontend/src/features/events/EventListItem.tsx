@@ -7,20 +7,12 @@ import { cameraCode, eventTypeLabel } from '@/lib/labels'
 import type { AnomalyEvent } from '@/types'
 import { useState } from 'react'
 
-interface EventListItemProps {
-  event: AnomalyEvent
-  /** Kamera listesi yüklenmediyse ya da kamera silindiyse yok. */
-  cameraName?: string
-}
-
 /** Olaylar listesindeki tek kart: küçük görüntü, önem, saat, tür, kamera ve "İncele". */
-export function EventListItem({ event, cameraName }: EventListItemProps) {
+export function EventListItem({ event }: { event: AnomalyEvent }) {
   const [imageFailed, setImageFailed] = useState(false)
   const snapshot = eventSnapshotUrl(event)
   const type = eventTypeLabel(event.type)
-  const camera = cameraName
-    ? `${cameraCode(event.camera_id)} · ${cameraName}`
-    : cameraCode(event.camera_id)
+  const camera = `${cameraCode(event.camera_id)} · ${event.camera.name}`
 
   return (
     <li>

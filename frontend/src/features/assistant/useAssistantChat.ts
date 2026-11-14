@@ -1,7 +1,8 @@
-import { ApiError } from '@/api/client'
+import { isConflict } from '@/api/client'
 import { useAssistantQuery } from '@/api/hooks/useAssistantQuery'
 import { useUpdateEventStatus } from '@/api/hooks/useUpdateEventStatus'
-import { assistantActions, eventCode } from '@/lib/labels'
+import { assistantActions } from '@/lib/eventRules'
+import { eventCode } from '@/lib/labels'
 import { useSpeech } from '@/lib/speech/useSpeech'
 import { useAssistantStore, type AssistantProposal } from '@/store/assistant'
 import { useUiStore } from '@/store/ui'
@@ -70,7 +71,7 @@ export function useAssistantChat() {
       } catch (error) {
         setProposalState(messageId, index, 'failed')
         reply(
-          error instanceof ApiError && error.status === 409
+          isConflict(error)
             ? `${code} durumu bu arada değişmiş; işlem yapılmadı.`
             : `${code} kaydedilemedi. Tekrar deneyin.`,
         )

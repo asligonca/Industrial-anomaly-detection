@@ -21,7 +21,6 @@ const columns: { label: string; width?: string }[] = [
 interface RecordsTableProps {
   /** Yükleniyorsa undefined. */
   events: AnomalyEvent[] | undefined
-  cameraNames: Map<number, string>
   /** Şimdiki zaman (bugünkü kayıtta yalnızca saat yazar). */
   now: Date
   /** Filtre değişti, yeni sonuç bekleniyor: eski satırlar soluk kalır. */
@@ -29,7 +28,7 @@ interface RecordsTableProps {
 }
 
 /** Kayıtlar tablosu. Dar ekranda kendi içinde yatay kayar, sayfa kaymaz. */
-export function RecordsTable({ events, cameraNames, now, stale }: RecordsTableProps) {
+export function RecordsTable({ events, now, stale }: RecordsTableProps) {
   return (
     // `relative`: başlıktaki sr-only (absolute) yazı kaydırma kutusundan kaçıp sayfayı genişletmesin.
     <div className="relative overflow-x-auto rounded-card border border-zinc-200 bg-white">
@@ -83,14 +82,7 @@ export function RecordsTable({ events, cameraNames, now, stale }: RecordsTablePr
               </td>
             </tr>
           ) : (
-            events.map((event) => (
-              <RecordRow
-                key={event.id}
-                event={event}
-                cameraName={cameraNames.get(event.camera_id)}
-                now={now}
-              />
-            ))
+            events.map((event) => <RecordRow key={event.id} event={event} now={now} />)
           )}
         </tbody>
       </table>

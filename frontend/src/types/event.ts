@@ -1,3 +1,5 @@
+import type { AlarmAction } from './alarm-action'
+
 /** `anomaly_events.type` */
 export type EventType =
   | 'restricted_zone'
@@ -9,10 +11,10 @@ export type EventType =
   | 'smoke_detected'
   | 'person_near_equipment'
 
-/** FE-12 (#25) önerisi, docx'te yok. */
+/** Backend `type`'tan doldurur (restricted_zone critical, no_helmet high, no_vest medium). */
 export type Severity = 'critical' | 'high' | 'medium' | 'info'
 
-/** `reviewing` FE-12 (#25) önerisi. `confirmed` ekranda "Kapandı" olarak görünür. */
+/** `confirmed` ekranda "Kapandı" olarak görünür. Geçiş kuralları: `lib/eventRules`. */
 export type EventStatus = 'new' | 'reviewing' | 'confirmed' | 'false_alarm'
 
 /** Tespit kutusu: [x1, y1, x2, y2] (sol üst ve sağ alt köşe), görüntüye göre 0–1 arası. */
@@ -24,6 +26,8 @@ export interface AnomalyEvent {
   /** Backend id'den üretir: 14 -> "OLY-014" (DB'de tutulmaz). */
   code: string
   camera_id: number
+  /** Kamera özeti (backend `selectinload` ile ekler); ad için ayrıca kamera listesi gerekmez. */
+  camera: EventCameraRef
   zone_id: number | null
   type: EventType
   confidence: number
@@ -40,18 +44,33 @@ export interface AnomalyEvent {
   created_at: string
 }
 
+/** Olay yanıtındaki kamera özeti. */
+export interface EventCameraRef {
+  id: number
+  name: string
+  area: string
+}
+
 /** Olay detayındaki bölge özeti. */
 export interface EventZoneRef {
   id: number
   name: string
 }
 
-/** `GET /events/{id}` yanıtı: liste kaydı + bölge adı ve tespit modeli sürümü. */
+/** `GET /events/{id}` yanıtı: liste kaydı + bölge, tespit modeli sürümü ve durum geçmişi. */
 export interface EventDetail extends AnomalyEvent {
   zone: EventZoneRef | null
   /** Örn. "yolo26n-exp1" */
   model_version: string
+  /** Durum değişiklikleri (`alarm_actions`). Sıra sözleşmede yok; ekran zamana göre sıralar. */
+  actions: AlarmAction[]
 }
+
+/** Sıralanabilen alanlar. `severity`: critical > high > medium > info. */
+export type EventSortField = 'created_at' | 'severity' | 'confidence'
+
+/** `?sort=`: alan adı, başında `-` azalan. Varsayılan `-created_at`. */
+export type EventSort = EventSortField | `-${EventSortField}`
 
 /**
  * `GET /events` sorgu parametreleri. Tarihler ISO string ya da YYYY-MM-DD.
@@ -60,16 +79,20 @@ export interface EventDetail extends AnomalyEvent {
  */
 export type EventFilters = {
   camera_id?: number
-  /** Dizi hali FE-12 (#25) önerisi ("Diğer" kategorisi birden çok türü kapsar). */
+  /** Kamera grubu (Üretim, Depo...): `cameras.area`. */
+  area?: string
+  /** Dizi olursa tekrarlı parametre ("Diğer" kategorisi birden çok türü kapsar). */
   type?: EventType | EventType[]
   status?: EventStatus | EventStatus[]
+  severity?: Severity | Severity[]
   /**
-   * Serbest metin arama: olay no (OLY-014 ya da 14), kamera adı/kodu, tür adı ya da kodu.
-   * FE-12 (#25) önerisi.
+   * Serbest metin arama: olay no (OLY-014 ya da 14), kamera adı ya da kodu. Türkçe tür adlarını
+   * arayüz `type`'a çevirir.
    */
   q?: string
   from?: string
   to?: string
+  sort?: EventSort
   limit?: number
   offset?: number
 }
@@ -77,7 +100,7 @@ export type EventFilters = {
 /** `GET /events/stats` tarih aralığı. */
 export type EventStatsRange = Pick<EventFilters, 'from' | 'to'>
 
-/** Liste yanıtı. FE-12 (#25)'e eklenecek öneri. */
+/** Sayfalı liste yanıtı (tüm liste uçları). */
 export interface Paginated<T> {
   items: T[]
   total: number
@@ -91,7 +114,7 @@ export interface EventStatusUpdate {
   note?: string
 }
 
-/** `GET /events/stats` yanıtı. Şekil FE-12 (#25) önerisi. */
+/** `GET /events/stats` yanıtı. */
 export interface EventStats {
   by_type: { type: EventType; count: number }[]
   by_camera: { camera_id: number; count: number }[]

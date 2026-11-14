@@ -1,6 +1,8 @@
+import { isConflict } from '@/api/client'
 import { useUpdateEventStatus } from '@/api/hooks/useUpdateEventStatus'
 import { StatusBadge } from '@/components/ui/Badge'
-import { eventStatusLabels, statusActionsFor } from '@/lib/labels'
+import { statusActionsFor } from '@/lib/eventRules'
+import { eventStatusLabels } from '@/lib/labels'
 import type { AnomalyEvent, EventStatus } from '@/types'
 import { useEffect, useId, useRef, useState, type ToggleEvent } from 'react'
 
@@ -9,7 +11,7 @@ const MENU_SPACE = 140
 const GAP = 4
 
 /**
- * Tablo satırında durum ve durum değiştirme menüsü. Kapanmış olayda yalnızca durum yazar.
+ * Tablo satırında durum ve durum değiştirme menüsü (kapanmış olayda "Yeniden aç").
  * Menü tarayıcının popover özelliğiyle açılır: dışarı tıklayınca ve Escape ile kendiliğinden
  * kapanır, kapanınca odak düğmeye döner. Tablo yatay kaydığı için menü satırın içinde değil,
  * sayfanın üst katmanında çizilir; konumu açılırken düğmeye göre hesaplanır.
@@ -33,27 +35,8 @@ export function StatusMenu({ event }: { event: AnomalyEvent }) {
     }
   }, [open])
 
+  // Her durumda en az bir geçiş var (backend kuralı), menü düğmesi hiç kaybolmaz.
   const actions = statusActionsFor(event.status)
-  const closed = actions.length === 0
-
-  // Olay kapanınca menü düğmesi kaybolur. Odak oradaysa sayfanın başına düşmesin, aynı satırdaki
-  // "Aç" bağlantısına geçsin. (Satır, liste yeniden çekilince değişir; mutate'in onSuccess'i o
-  // sırada düğmeyi artık bulamaz, bu yüzden effect.)
-  const refocusOnClose = useRef(false)
-  const closedRef = useRef<HTMLSpanElement>(null)
-  useEffect(() => {
-    if (!closed || !refocusOnClose.current) return
-    refocusOnClose.current = false
-    closedRef.current?.closest('tr')?.querySelector<HTMLElement>('a[href]')?.focus()
-  }, [closed])
-
-  if (closed) {
-    return (
-      <span ref={closedRef}>
-        <StatusBadge status={event.status} variant="dot" />
-      </span>
-    )
-  }
 
   function place(e: ToggleEvent<HTMLDivElement>) {
     const menu = e.currentTarget
@@ -72,9 +55,8 @@ export function StatusMenu({ event }: { event: AnomalyEvent }) {
   }
 
   function choose(status: EventStatus) {
+    // Popover kapanınca odak düğmeye döner.
     menuRef.current?.hidePopover()
-    // Popover kapanınca odak düğmeye döner; klavyeyle çalışan kullanıcı odakta mı?
-    refocusOnClose.current = document.activeElement === triggerRef.current
     update.mutate({ id: event.id, status })
   }
 
@@ -127,7 +109,7 @@ export function StatusMenu({ event }: { event: AnomalyEvent }) {
 
       {update.isError && (
         <p role="alert" title={update.error.message} className="text-[12px] text-danger">
-          Kaydedilemedi
+          {isConflict(update.error) ? 'Durum değişmiş' : 'Kaydedilemedi'}
         </p>
       )}
     </div>

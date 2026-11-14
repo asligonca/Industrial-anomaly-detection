@@ -2,15 +2,7 @@
  * API kodu -> ekran etiketi. API'ye her zaman kod gider, ekrana her zaman etiket çıkar.
  * Backend kodları değiştirirse yalnızca bu dosya ve `src/types` güncellenir.
  */
-import type {
-  AgentName,
-  AssistantAction,
-  EventStatus,
-  EventType,
-  Role,
-  RuleType,
-  Severity,
-} from '@/types'
+import type { AgentName, EventStatus, EventType, Role, RuleType, Severity } from '@/types'
 
 export const eventTypeLabels: Record<EventType, string> = {
   restricted_zone: 'Yasak bölge',
@@ -71,23 +63,8 @@ export function eventTypeStatLabel(type: EventType): string {
 /** Geçerli kodlar, etiket haritalarından türetilir; yeni kod eklenince tek yerde tutulur. */
 export const eventTypes = Object.keys(eventTypeLabels) as EventType[]
 export const eventStatuses = Object.keys(eventStatusLabels) as EventStatus[]
+export const severities = Object.keys(severityLabels) as Severity[]
 export const ruleTypes = Object.keys(ruleTypeLabels) as RuleType[]
-
-/** Operatörün ilgilenmesi gereken durumlar (Olaylar listesi, menü rozeti, kamera vurgusu). */
-export const OPEN_STATUSES: EventStatus[] = ['new', 'reviewing']
-
-export const isOpenStatus = (status: EventStatus) => OPEN_STATUSES.includes(status)
-
-/**
- * Asistan önerisinin onay düğmesi ve onaylanınca olayın geçeceği durum. Sözleşme:
- * `acknowledge_alarm` -> `reviewing` (backend-notlari madde 39).
- */
-export const assistantActions: Record<
-  AssistantAction['type'],
-  { label: string; status: EventStatus; done: string }
-> = {
-  acknowledge_alarm: { label: 'İncelemeye al', status: 'reviewing', done: 'incelemeye alındı' },
-}
 
 export const agentLabels: Record<AgentName, string> = {
   watcher: 'Gözcü Ajan',
@@ -143,26 +120,6 @@ export function eventTypesMatching(text: string): EventType[] {
 /** Kategorinin kapsadığı türler. API'ye `?type=` olarak bunlar gider. */
 export function eventCategoryTypes(category: EventCategory): EventType[] {
   return eventTypes.filter((type) => eventCategory(type) === category)
-}
-
-/** Durum değiştirme düğmesi: hedef durum ve düğme yazısı. */
-export interface StatusAction {
-  status: EventStatus
-  label: string
-}
-
-/**
- * Açık olayda yapılabilecek durum değişiklikleri, sırası ekrandaki gibi. Kapanmış olayda boş:
- * olay yeniden açılmaz. Olay detayı ve Kayıtlar tablosu aynı listeyi kullanır.
- */
-export function statusActionsFor(status: EventStatus): StatusAction[] {
-  const close: StatusAction[] = [
-    { status: 'false_alarm', label: 'Yanlış alarm' },
-    { status: 'confirmed', label: 'Olayı kapat' },
-  ]
-  if (status === 'new') return [{ status: 'reviewing', label: 'Üstlen' }, ...close]
-  if (status === 'reviewing') return close
-  return []
 }
 
 /** 14 -> "OLY-014" */

@@ -1,9 +1,10 @@
-import { buttonVariants } from '@/components/ui/buttonStyles'
+import { IconButton } from '@/components/ui/Button'
+import { chipClass } from '@/components/ui/chipStyles'
 import { inputClass } from '@/components/ui/inputStyles'
-import { cn } from '@/lib/cn'
+import { stopSpeech } from '@/lib/speech/player'
 import { useSpeechRecognition } from '@/lib/speech/useSpeechRecognition'
 import { useAssistantStore } from '@/store/assistant'
-import { useEffect, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { MicIcon } from './AssistantButton'
 import { AssistantMessageItem } from './AssistantMessageItem'
 import { ASSISTANT_PANEL_ID, ASSISTANT_SUGGESTIONS } from './constants'
@@ -11,7 +12,8 @@ import { useAssistantChat } from './useAssistantChat'
 
 /**
  * Sesli asistan paneli: sağ altta, düğmenin üstünde (dar ekranda tam genişlik). Açılınca odak
- * metin alanına gelir; Escape ya da × kapatır (odağı düğmeye geri vermek `onClose`'un işi).
+ * metin alanına gelir; × kapatır, Escape'i `AssistantDock` dinler (odağı düğmeye geri vermek
+ * `onClose`'un işi).
  * Modal değil: arkadaki sayfa kullanılabilir kalır.
  */
 export function AssistantPanel({ onClose }: { onClose: () => void }) {
@@ -21,9 +23,10 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   const { ask, pending, approve, dismiss, speech } = useAssistantChat()
   const [draft, setDraft] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
-  const listRef = useRef<HTMLOListElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
-  const recognition = useSpeechRecognition((text) => ask(text))
+  // Yanıt beklenirken gelen sesli soru kaybolmasın: metin alanına yazılır, kullanıcı gönderir.
+  const recognition = useSpeechRecognition((text) => (pending ? setDraft(text) : ask(text)))
 
   // Panel açılınca odak metin alanına.
   useEffect(() => inputRef.current?.focus(), [])
@@ -52,7 +55,9 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
       recognition.stop()
       return
     }
-    speech.stop() // Asistan kendi sesini duymasın.
+    if (pending) return
+    // Mikrofon hiçbir okumayı duymasın: asistanınki de, sayfadaki sesli özet de durur.
+    stopSpeech()
     recognition.start()
   }
 
@@ -68,13 +73,6 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
     setVoiceEnabled(!voiceEnabled)
   }
 
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      event.stopPropagation()
-      onClose()
-    }
-  }
-
   const subtitle =
     speech.download !== null
       ? `Ses hazırlanıyor… %${Math.round(speech.download * 100)}`
@@ -85,7 +83,6 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
       id={ASSISTANT_PANEL_ID}
       role="dialog"
       aria-labelledby="assistant-title"
-      onKeyDown={onKeyDown}
       className="fixed inset-x-4 bottom-24 z-30 flex h-[520px] max-h-[calc(100dvh-120px)] flex-col overflow-hidden rounded-card border border-zinc-200 bg-white shadow-popover sm:inset-x-auto sm:right-6 sm:w-[380px]"
     >
       <header className="flex items-center justify-between gap-3 border-b border-zinc-100 py-4 pr-3 pl-5">
@@ -97,55 +94,53 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
         </div>
         <div className="flex items-center gap-1">
           {speech.supported && (
-            <button
-              type="button"
+            <IconButton
               onClick={toggleVoice}
               aria-pressed={voiceEnabled}
-              aria-label="Yanıtları sesli oku"
+              label="Yanıtları sesli oku"
               title={voiceEnabled ? 'Sesli yanıt açık' : 'Sesli yanıt kapalı'}
-              className="grid size-9 place-items-center rounded-control text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
             >
               <SpeakerIcon muted={!voiceEnabled} />
-            </button>
+            </IconButton>
           )}
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Asistanı kapat"
-            className="grid size-9 place-items-center rounded-control text-[22px] leading-none text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900"
-          >
-            ×
-          </button>
+          <IconButton onClick={onClose} label="Asistanı kapat">
+            <CloseIcon />
+          </IconButton>
         </div>
       </header>
 
-      <ol
+      {/* `role="log"` liste öğesine konamaz (liste anlamı kaybolur): saran kutuda. */}
+      <div
         ref={listRef}
         role="log"
         aria-live="polite"
         aria-label="Konuşma"
-        className="flex flex-1 flex-col gap-3 overflow-y-auto p-5"
+        className="flex-1 overflow-y-auto p-5"
       >
-        {messages.map((message) => (
-          <AssistantMessageItem
-            key={message.id}
-            message={message}
-            onApprove={(messageId, index, proposal) =>
-              void approve(messageId, index, proposal).then(refocusInput)
-            }
-            onDismiss={(messageId, index) => {
-              dismiss(messageId, index)
-              inputRef.current?.focus()
-            }}
-          />
-        ))}
-        {pending && (
-          <li className="self-start rounded-xl bg-zinc-100 px-3.5 py-2.5 text-sm text-zinc-500">
-            Yanıtlanıyor…
-          </li>
-        )}
-        {recognition.listening && <li className="self-end text-[13px] text-danger">Dinleniyor…</li>}
-      </ol>
+        <ol className="flex flex-col gap-3">
+          {messages.map((message) => (
+            <AssistantMessageItem
+              key={message.id}
+              message={message}
+              onApprove={(messageId, index, proposal) =>
+                void approve(messageId, index, proposal).then(refocusInput)
+              }
+              onDismiss={(messageId, index) => {
+                dismiss(messageId, index)
+                inputRef.current?.focus()
+              }}
+            />
+          ))}
+          {pending && (
+            <li className="self-start rounded-xl bg-zinc-100 px-3.5 py-2.5 text-sm text-zinc-500">
+              Yanıtlanıyor…
+            </li>
+          )}
+          {recognition.listening && (
+            <li className="self-end text-[13px] text-danger">Dinleniyor…</li>
+          )}
+        </ol>
+      </div>
 
       <div className="flex flex-col gap-3 border-t border-zinc-100 px-4 py-3">
         <div role="group" aria-label="Önerilen sorular" className="flex flex-wrap gap-2">
@@ -155,10 +150,7 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
               type="button"
               aria-disabled={pending || undefined}
               onClick={() => ask(suggestion)}
-              className={cn(
-                'h-[30px] rounded-full px-3 text-xs aria-disabled:cursor-not-allowed aria-disabled:opacity-60',
-                buttonVariants.secondary,
-              )}
+              className={chipClass('sm')}
             >
               {suggestion}
             </button>
@@ -177,20 +169,17 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
             className={inputClass('md', 'min-w-0 flex-1')}
           />
           {recognition.supported && (
-            <button
-              type="button"
+            <IconButton
               onClick={toggleListening}
+              // Yanıt beklenirken yeni soru sorulamaz; dinleme sürüyorsa durdurulabilir.
+              aria-disabled={(pending && !recognition.listening) || undefined}
               aria-pressed={recognition.listening}
-              aria-label={recognition.listening ? 'Dinlemeyi durdur' : 'Sesle sor'}
-              className={cn(
-                'grid size-[42px] flex-none place-items-center rounded-control border',
-                recognition.listening
-                  ? 'border-danger bg-danger stroke-white'
-                  : 'border-zinc-300 bg-white stroke-zinc-900 hover:bg-zinc-100',
-              )}
+              label={recognition.listening ? 'Dinlemeyi durdur' : 'Sesle sor'}
+              variant={recognition.listening ? 'alert' : 'outline'}
+              size="md"
             >
               <MicIcon size={18} />
-            </button>
+            </IconButton>
           )}
         </form>
         {recognition.error && (
@@ -222,6 +211,23 @@ function SpeakerIcon({ muted }: { muted: boolean }) {
       ) : (
         <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
       )}
+    </svg>
+  )
+}
+
+function CloseIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      aria-hidden
+    >
+      <path d="M6 6l12 12M18 6 6 18" />
     </svg>
   )
 }

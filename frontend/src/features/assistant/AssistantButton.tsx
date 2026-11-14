@@ -17,24 +17,25 @@ export function AssistantButton({ open, onToggle, ref }: AssistantButtonProps) {
       aria-label="Sesli asistan"
       aria-expanded={open}
       aria-controls={open ? ASSISTANT_PANEL_ID : undefined}
-      className="fixed right-6 bottom-6 z-30 grid size-14 place-items-center rounded-full bg-zinc-900 shadow-float hover:bg-zinc-700"
+      className="fixed right-6 bottom-6 z-30 grid size-14 place-items-center rounded-full bg-zinc-900 text-white shadow-float hover:bg-zinc-700"
     >
-      <MicIcon size={22} className="stroke-white" />
+      <MicIcon size={22} />
     </button>
   )
 }
 
-export function MicIcon({ size, className }: { size: number; className?: string }) {
+/** Mikrofon ikonu; rengi düğmenin yazı renginden (`currentColor`). */
+export function MicIcon({ size }: { size: number }) {
   return (
     <svg
       width={size}
       height={size}
       viewBox="0 0 24 24"
       fill="none"
+      stroke="currentColor"
       strokeWidth="1.8"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={className}
       aria-hidden
     >
       <rect x="9" y="3" width="6" height="11" rx="3" />

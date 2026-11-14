@@ -9,14 +9,12 @@ import { StatusMenu } from './StatusMenu'
 
 interface RecordRowProps {
   event: AnomalyEvent
-  /** Kamera listesi yüklenmediyse ya da kamera silindiyse yok. */
-  cameraName?: string
   /** Şimdiki zaman: bugünkü kayıtta yalnızca saat yazar, eskilerde tarih de. */
   now: Date
 }
 
 /** Kayıtlar tablosunun tek satırı. */
-export function RecordRow({ event, cameraName, now }: RecordRowProps) {
+export function RecordRow({ event, now }: RecordRowProps) {
   const [imageFailed, setImageFailed] = useState(false)
   const snapshot = eventSnapshotUrl(event)
   const created = new Date(event.created_at)
@@ -52,7 +50,7 @@ export function RecordRow({ event, cameraName, now }: RecordRowProps) {
         <span className="block font-mono text-[12px] text-camera-code-ink">
           {cameraCode(event.camera_id)}
         </span>
-        {cameraName && <span className="block truncate">{cameraName}</span>}
+        <span className="block truncate">{event.camera.name}</span>
       </td>
       <td className="truncate pr-4 font-semibold">{type}</td>
       <td className="pr-4">

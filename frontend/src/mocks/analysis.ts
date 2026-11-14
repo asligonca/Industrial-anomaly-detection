@@ -4,8 +4,9 @@
  */
 import { formatConfidence } from '@/lib/format'
 import { eventTypeLabel, severityLabels } from '@/lib/labels'
-import type { AnomalyEvent, EventAnalysis, EventType, Severity } from '@/types'
-import { db } from './db'
+import type { EventAnalysis, EventType, Severity } from '@/types'
+import type { EventRow } from './rows'
+import { cameraNameOf, db } from './db'
 
 const regulationTexts: Record<EventType, string> = {
   restricted_zone:
@@ -33,10 +34,10 @@ const STEP_OFFSETS_MS = [300, 700, 1200] as const
 
 const sameDay = (a: Date, b: Date) => a.toDateString() === b.toDateString()
 
-export function buildEventAnalysis(event: AnomalyEvent): EventAnalysis {
+export function buildEventAnalysis(event: EventRow): EventAnalysis {
   const createdAt = new Date(event.created_at)
   const at = (ms: number) => new Date(createdAt.getTime() + ms).toISOString()
-  const cameraName = db.cameras.find((c) => c.id === event.camera_id)?.name ?? 'Bilinmeyen kamera'
+  const cameraName = cameraNameOf(event.camera_id)
   const type = eventTypeLabel(event.type).toLocaleLowerCase('tr')
   const sameCameraToday = db.events.filter(
     (e) => e.camera_id === event.camera_id && sameDay(new Date(e.created_at), createdAt),

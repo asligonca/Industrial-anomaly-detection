@@ -10,7 +10,7 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { toDateInputValue } from '@/lib/format'
 import { eventCategories, eventCategoryLabels } from '@/lib/labels'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { DateRangeFilter } from './DateRangeFilter'
 import { HourlyChart } from './HourlyChart'
 import { RecordsSearch } from './RecordsSearch'
@@ -38,11 +38,6 @@ export function RecordsPage() {
   const cameras = useCameras()
   // Sayfa açıldığı gün: tarih seçicinin son günü ve "bugünse yalnızca saat" kuralı için.
   const [openedAt] = useState(() => new Date())
-
-  const cameraNames = useMemo(
-    () => new Map((cameras.data ?? []).map((c) => [c.id, c.name])),
-    [cameras.data],
-  )
 
   // Turuncu "şu an" sütunu yalnızca grafik bugünü tek başına gösterirken anlamlı. Birden çok gün
   // üst üste toplanınca "şu anki saat" hiçbir sütuna karşılık gelmez. Saat, verinin çekildiği an.
@@ -115,12 +110,7 @@ export function RecordsPage() {
         <ErrorBox message="Kayıtlar yüklenemedi." onRetry={() => void events.refetch()} />
       ) : (
         <div className="flex flex-col gap-3">
-          <RecordsTable
-            events={result?.items}
-            cameraNames={cameraNames}
-            now={openedAt}
-            stale={events.isPlaceholderData}
-          />
+          <RecordsTable events={result?.items} now={openedAt} stale={events.isPlaceholderData} />
           {beyondLastPage ? (
             <div>
               <Button variant="secondary" size="sm" onClick={() => update({ page: 1 })}>

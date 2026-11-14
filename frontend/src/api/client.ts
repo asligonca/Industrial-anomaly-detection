@@ -13,6 +13,10 @@ export class ApiError extends Error {
   }
 }
 
+/** Backend izin vermediği durum geçişinde (ya da çakışan kayıtta) 409 döner. */
+export const isConflict = (error: unknown): error is ApiError =>
+  error instanceof ApiError && error.status === 409
+
 type TokenProvider = () => string | null
 
 let getToken: TokenProvider = () => null

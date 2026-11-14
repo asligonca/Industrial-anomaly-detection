@@ -1,12 +1,12 @@
-import { eventTypeLabel, isOpenStatus } from '@/lib/labels'
-import type { AnomalyEvent, AssistantResponse } from '@/types'
+import { isOpenStatus } from '@/lib/eventRules'
+import { eventTypeLabel } from '@/lib/labels'
+import type { AssistantResponse } from '@/types'
 import { http, HttpResponse } from 'msw'
-import { addAgentLog, db } from '../db'
+import { addAgentLog, cameraNameOf, db } from '../db'
+import type { EventRow } from '../rows'
 import { apiPath, authed, errorResponse, invalidBody, readJsonObject } from '../utils'
 
-const isOpen = (e: AnomalyEvent) => isOpenStatus(e.status)
-
-const cameraName = (id: number) => db.cameras.find((c) => c.id === id)?.name ?? `Kamera ${id}`
+const isOpen = (e: EventRow) => isOpenStatus(e.status)
 
 const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toDateString()
 
@@ -14,7 +14,7 @@ const isToday = (iso: string) => new Date(iso).toDateString() === new Date().toD
 function respond(query: string): AssistantResponse {
   const text = query.toLocaleLowerCase('tr')
 
-  if (/kapat|incele|üstlen/.test(text)) {
+  if (/kapat/.test(text)) {
     // Sözleşme: asistan yalnızca önerir, olayı değiştirmez. Onaylanınca ön yüz
     // PATCH /events/{id}/status ile `reviewing` yapar (acknowledge_alarm). En yeni yeni olay.
     const event = db.events
@@ -22,7 +22,7 @@ function respond(query: string): AssistantResponse {
       .sort((a, b) => b.created_at.localeCompare(a.created_at))[0]
     if (!event) return { answer: 'İncelemeye alınacak yeni olay yok.', actions: [] }
     return {
-      answer: `${event.code}: ${eventTypeLabel(event.type)}, ${cameraName(event.camera_id)}. İncelemeye alınsın mı?`,
+      answer: `${event.code}: ${eventTypeLabel(event.type)}, ${cameraNameOf(event.camera_id)}. İncelemeye alınsın mı?`,
       actions: [{ type: 'acknowledge_alarm', event_id: event.id }],
     }
   }
@@ -58,7 +58,7 @@ function respond(query: string): AssistantResponse {
       return { answer: `${head} ${summary}.`, actions: [] }
     }
     const list = open
-      .map((e) => `${eventTypeLabel(e.type)} (${cameraName(e.camera_id)})`)
+      .map((e) => `${eventTypeLabel(e.type)} (${cameraNameOf(e.camera_id)})`)
       .join(', ')
     return { answer: `${summary}${list ? `: ${list}` : ''}.`, actions: [] }
   }

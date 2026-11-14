@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
-import { assistantActions, eventCode } from '@/lib/labels'
+import { assistantActions } from '@/lib/eventRules'
+import { eventCode } from '@/lib/labels'
 import type { AssistantMessage, AssistantProposal } from '@/store/assistant'
 
 interface AssistantMessageItemProps {
@@ -61,7 +62,7 @@ function ProposalControls({ proposal, onApprove, onDismiss }: ProposalControlsPr
         onClick={() => {
           if (!saving) onApprove()
         }}
-        aria-label={`${code}: ${action.label}`}
+        aria-label={saving ? `${code}: kaydediliyor` : `${code}: ${action.label}`}
       >
         {saving ? 'Kaydediliyor…' : action.label}
       </Button>

@@ -6,7 +6,6 @@
 import type {
   AgentLog,
   AlarmAction,
-  AnomalyEvent,
   AuditAction,
   AuditDetails,
   AuditLog,
@@ -14,23 +13,32 @@ import type {
   EventStatus,
   User,
 } from '@/types'
+import { alarmActions } from './data/alarm-actions'
+import { cameraCode } from '@/lib/labels'
 import { auditLogs } from './data/audit-logs'
 import { cameras } from './data/cameras'
 import { events } from './data/events'
 import { mockPasswords, users } from './data/users'
 import { zones } from './data/zones'
+import type { EventRow } from './rows'
 
 export const db = {
   users: structuredClone(users),
   cameras: structuredClone(cameras),
   zones: structuredClone(zones),
   events: structuredClone(events),
-  alarmActions: [] as AlarmAction[],
+  alarmActions: structuredClone(alarmActions) as AlarmAction[],
   agentLogs: [] as AgentLog[],
   auditLogs: structuredClone(auditLogs),
   /** Kullanıcı adı -> parola. Yalnızca mock; yeni kullanıcı eklenince buraya da yazılır. */
   passwords: structuredClone(mockPasswords),
 }
+
+/** Kamera kaydı (silinmiş / bilinmeyen id'de `undefined`). */
+export const findCamera = (id: number) => db.cameras.find((c) => c.id === id)
+
+/** Kameranın adı; kamera yoksa kodu ("KAM-07"). Mock'un her yerinde aynı yedek. */
+export const cameraNameOf = (id: number) => findCamera(id)?.name ?? cameraCode(id)
 
 export function nextId(rows: { id: number }[]): number {
   return rows.reduce((max, row) => Math.max(max, row.id), 0) + 1
@@ -78,11 +86,11 @@ export function addAgentLog(user: User, query: string, response: string): AgentL
 
 /** Olayın durumunu değiştirir; backend'deki gibi alarm_actions ve denetim kaydı düşer. */
 export function setEventStatus(
-  event: AnomalyEvent,
+  event: EventRow,
   status: EventStatus,
   user: User,
   note: string | null = null,
-): AnomalyEvent {
+): EventRow {
   const from = event.status
   event.status = status
   db.alarmActions.push({

@@ -1,6 +1,7 @@
 import { Badge, SeverityBadge, StatusBadge } from '@/components/ui/Badge'
-import { Button, LinkButton } from '@/components/ui/Button'
+import { Button, IconButton, LinkButton } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { chipClass } from '@/components/ui/chipStyles'
 import { Dialog } from '@/components/ui/Dialog'
 import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorBox } from '@/components/ui/ErrorBox'
@@ -27,6 +28,24 @@ function FilterChipsDemo() {
   const [value, setValue] = useState('all')
   return (
     <FilterChips label="Örnek filtre" options={groupOptions} value={value} onChange={setValue} />
+  )
+}
+
+/** Örnek ikon (gerçek ekranlarda ikon bileşeni kendi dosyasında). */
+function DemoIcon() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      aria-hidden
+    >
+      <rect x="9" y="3" width="6" height="11" rx="3" />
+      <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
+    </svg>
   )
 }
 
@@ -127,6 +146,23 @@ export function UiKitPage() {
         </div>
       </Block>
 
+      <Block title="İkon düğmesi (ghost sm / outline md / alert md / kaydediliyor)">
+        <div className="flex flex-wrap items-center gap-3">
+          <IconButton label="Örnek (ghost)">
+            <DemoIcon />
+          </IconButton>
+          <IconButton label="Örnek (outline)" variant="outline" size="md">
+            <DemoIcon />
+          </IconButton>
+          <IconButton label="Örnek (alert)" variant="alert" size="md" aria-pressed>
+            <DemoIcon />
+          </IconButton>
+          <IconButton label="Örnek (kaydediliyor)" variant="outline" size="md" aria-disabled>
+            <DemoIcon />
+          </IconButton>
+        </div>
+      </Block>
+
       <Block title="Anahtar (açık / kapalı / kaydediliyor)">
         <SwitchDemo />
       </Block>
@@ -137,8 +173,16 @@ export function UiKitPage() {
         </div>
       </Block>
 
-      <Block title="Filtre (tek seçim)">
+      <Block title="Filtre (tek seçim) ve küçük çip (sm)">
         <FilterChipsDemo />
+        <div className="flex flex-wrap gap-2">
+          <button type="button" className={chipClass('sm')}>
+            Öneri çipi (sm)
+          </button>
+          <button type="button" className={chipClass('sm')} aria-disabled>
+            Devre dışı
+          </button>
+        </div>
       </Block>
 
       <Block title="Önem rozeti (sm / md / lg)">

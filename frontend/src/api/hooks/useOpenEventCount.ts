@@ -1,4 +1,4 @@
-import { OPEN_STATUSES } from '@/lib/labels'
+import { OPEN_STATUSES } from '@/lib/eventRules'
 import { useEvents } from './useEvents'
 
 /**
