@@ -4,12 +4,13 @@ export interface Camera {
   /** Backend id'den üretir: 3 -> "KAM-03" (olay koduyla aynı mantık). */
   code: string
   name: string
-  location: string
+  /** Boş bırakılabilir: `null`. */
+  location: string | null
   /**
-   * RTSP adresi ya da video dosyası yolu. Parola backend'de maskelenir:
-   * "rtsp://kullanici:***@10.0.1.11/stream" (gerçek parola API'den hiç dönmez).
+   * RTSP adresi ya da video dosyası yolu; backend'de boş olabilir (`null`). Parola backend'de
+   * maskelenir: "rtsp://kullanici:***@10.0.1.11/stream" (gerçek parola API'den hiç dönmez).
    */
-  stream_url: string
+  stream_url: string | null
   is_active: boolean
   /** Ekrandaki kamera grubu (Üretim, Depo...). SQL'de `GROUP` ayrılmış kelime olduğu için `area`. */
   area: string

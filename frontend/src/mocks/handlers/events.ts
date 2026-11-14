@@ -1,4 +1,4 @@
-import { cameraCode, eventCode, eventStatuses, eventTypes } from '@/lib/labels'
+import { cameraCode, eventStatuses, eventTypes } from '@/lib/labels'
 import type { AnomalyEvent, EventDetail, EventStatus, EventType } from '@/types'
 import { http, HttpResponse } from 'msw'
 import { buildEventAnalysis } from '../analysis'
@@ -58,12 +58,7 @@ const normalize = (text: string) => text.toLocaleLowerCase('tr-TR')
  */
 function matchesQuery(event: AnomalyEvent, query: string): boolean {
   const camera = db.cameras.find((c) => c.id === event.camera_id)
-  const haystack = [
-    eventCode(event.id),
-    String(event.id),
-    cameraCode(event.camera_id),
-    camera?.name ?? '',
-  ]
+  const haystack = [event.code, String(event.id), cameraCode(event.camera_id), camera?.name ?? '']
   return haystack.some((text) => normalize(text).includes(query))
 }
 

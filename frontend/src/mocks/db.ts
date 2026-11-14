@@ -3,7 +3,6 @@
  * bunu değiştirir, böylece sonraki GET istekleri güncel veriyi görür.
  * Sayfa yenilenince fixture'a geri döner.
  */
-import { eventCode } from '@/lib/labels'
 import type {
   AgentLog,
   AlarmAction,
@@ -99,7 +98,7 @@ export function setEventStatus(
     user,
     'event.status_changed',
     { type: 'event', id: event.id },
-    { label: eventCode(event.id), from, to: status },
+    { label: event.code, from, to: status },
   )
   return event
 }

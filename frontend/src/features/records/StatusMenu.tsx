@@ -1,6 +1,6 @@
 import { useUpdateEventStatus } from '@/api/hooks/useUpdateEventStatus'
 import { StatusBadge } from '@/components/ui/Badge'
-import { eventCode, eventStatusLabels, statusActionsFor } from '@/lib/labels'
+import { eventStatusLabels, statusActionsFor } from '@/lib/labels'
 import type { AnomalyEvent, EventStatus } from '@/types'
 import { useEffect, useId, useRef, useState, type ToggleEvent } from 'react'
 
@@ -78,7 +78,7 @@ export function StatusMenu({ event }: { event: AnomalyEvent }) {
     update.mutate({ id: event.id, status })
   }
 
-  const code = eventCode(event.id)
+  const code = event.code
 
   return (
     <div className="flex flex-col items-start gap-1">

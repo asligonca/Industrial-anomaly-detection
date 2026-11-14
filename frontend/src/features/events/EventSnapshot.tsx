@@ -31,17 +31,18 @@ interface EventSnapshotProps {
 export function EventSnapshot({ event, cameraName }: EventSnapshotProps) {
   const [failed, setFailed] = useState(false)
   const type = eventTypeLabel(event.type)
+  const src = eventSnapshotUrl(event)
 
   return (
     <figure className="relative overflow-hidden rounded-card bg-zinc-800">
-      {failed ? (
+      {!src || failed ? (
         <div className="grid aspect-video place-items-center text-sm text-zinc-300">
-          Görüntü yüklenemedi
+          {src ? 'Görüntü yüklenemedi' : 'Görüntü yok'}
         </div>
       ) : (
         <div className="relative">
           <img
-            src={eventSnapshotUrl(event)}
+            src={src}
             alt={`${type} tespiti${cameraName ? `, ${cameraName}` : ''}`}
             onError={() => setFailed(true)}
             className="block h-auto w-full"

@@ -34,6 +34,11 @@ export function nonEmptyString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null
 }
 
+/** Kullanıcı adları büyük/küçük harfe duyarsız karşılaştırılır (giriş ve tekillik, madde 31). */
+export function sameUsername(a: string, b: string): boolean {
+  return a.toLocaleLowerCase('tr-TR') === b.toLocaleLowerCase('tr-TR')
+}
+
 /** Adres parametresindeki id tam sayı değilse 422 yanıtı, sayıysa sayı. */
 export function parseId(raw: string): number | Response {
   return /^\d+$/.test(raw) ? Number(raw) : errorResponse(422, 'id must be an integer')

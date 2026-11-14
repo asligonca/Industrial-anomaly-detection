@@ -3,7 +3,7 @@ import { SeverityBadge, StatusBadge } from '@/components/ui/Badge'
 import { LinkButton } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { formatEventTime } from '@/lib/format'
-import { cameraCode, eventCode, eventTypeLabel } from '@/lib/labels'
+import { cameraCode, eventTypeLabel } from '@/lib/labels'
 import type { AnomalyEvent } from '@/types'
 import { useState } from 'react'
 
@@ -16,6 +16,7 @@ interface EventListItemProps {
 /** Olaylar listesindeki tek kart: küçük görüntü, önem, saat, tür, kamera ve "İncele". */
 export function EventListItem({ event, cameraName }: EventListItemProps) {
   const [imageFailed, setImageFailed] = useState(false)
+  const snapshot = eventSnapshotUrl(event)
   const type = eventTypeLabel(event.type)
   const camera = cameraName
     ? `${cameraCode(event.camera_id)} · ${cameraName}`
@@ -24,11 +25,11 @@ export function EventListItem({ event, cameraName }: EventListItemProps) {
   return (
     <li>
       <Card padding="none" className="flex items-center gap-4 py-3.5 pr-4 pl-3.5 sm:gap-5 sm:pr-5">
-        {/* Görüntü yüklenemezse koyu zemin kalır; bilgi yazılarda var. */}
+        {/* Görüntü yoksa ya da yüklenemezse koyu zemin kalır; bilgi yazılarda var. */}
         <div className="h-[60px] w-24 flex-none overflow-hidden rounded-control bg-zinc-800 sm:h-20 sm:w-[132px]">
-          {!imageFailed && (
+          {snapshot && !imageFailed && (
             <img
-              src={eventSnapshotUrl(event)}
+              src={snapshot}
               alt=""
               loading="lazy"
               onError={() => setImageFailed(true)}
@@ -52,7 +53,7 @@ export function EventListItem({ event, cameraName }: EventListItemProps) {
         <LinkButton
           to={`/events/${event.id}`}
           variant="primary"
-          aria-label={`${eventCode(event.id)} ${type} olayını incele`}
+          aria-label={`${event.code} ${type} olayını incele`}
           className="flex-none"
         >
           İncele

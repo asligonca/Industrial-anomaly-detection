@@ -30,7 +30,7 @@ export function updateEventStatus(id: number, update: EventStatusUpdate) {
   return apiRequest<AnomalyEvent>(`/events/${id}/status`, { method: 'PATCH', json: update })
 }
 
-/** Olay görüntüsünün `<img src>` adresi: backend'in `snapshot_url`'i + token. */
-export function eventSnapshotUrl(event: Pick<AnomalyEvent, 'snapshot_url'>): string {
-  return withToken(event.snapshot_url)
+/** Olay görüntüsünün `<img src>` adresi: backend'in `snapshot_url`'i + token. Görüntü yoksa `null`. */
+export function eventSnapshotUrl(event: Pick<AnomalyEvent, 'snapshot_url'>): string | null {
+  return event.snapshot_url ? withToken(event.snapshot_url) : null
 }

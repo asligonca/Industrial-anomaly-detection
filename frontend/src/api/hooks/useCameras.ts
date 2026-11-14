@@ -5,6 +5,6 @@ import { queryKeys } from '../queryKeys'
 export function useCameras() {
   return useQuery({
     queryKey: queryKeys.cameras.all,
-    queryFn: ({ signal }) => getCameras(signal),
+    queryFn: async ({ signal }) => (await getCameras(signal)).items,
   })
 }

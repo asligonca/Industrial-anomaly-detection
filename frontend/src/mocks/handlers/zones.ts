@@ -8,8 +8,10 @@ import {
   errorResponse,
   invalidBody,
   nonEmptyString,
+  paginate,
   parseId,
   readJsonObject,
+  readPage,
 } from '../utils'
 
 /** En az 3 köşe, her köşe görüntüye göre 0–1 arası [x, y] (backend-notlari madde 9). */
@@ -26,7 +28,16 @@ export const zoneHandlers = [
   http.get(
     apiPath('/zones'),
     // Silinen (pasif) bölgeler listede yok; olay detayı yine adını bulur.
-    authed(() => HttpResponse.json(db.zones.filter((zone) => zone.is_active))),
+    authed(({ request }) => {
+      const page = readPage(new URL(request.url).searchParams)
+      if (page instanceof Response) return page
+      return HttpResponse.json(
+        paginate(
+          db.zones.filter((zone) => zone.is_active),
+          page,
+        ),
+      )
+    }),
   ),
 
   http.post(
