@@ -54,7 +54,8 @@ Endüstriyel tesislerde ve kritik alanlarda güvenlik kameralarından alınan ca
 - React.js (Vite)
 - TypeScript / JavaScript
 - Tailwind CSS
-- Web Speech API (STT / TTS)
+- Web Speech API (STT; TTS yedeği)
+- Piper TTS (`tr_TR-dfki-medium` Türkçe ses, tarayıcıda ONNX Runtime ile)
 
 **Yapay Zekâ / Servisler**
 - Google Gemini API (Google AI Studio)
@@ -118,7 +119,8 @@ flowchart LR
 - Google AI Studio'dan alınmış bir **Gemini API anahtarı**
 
 ### Tarayıcı Notu
-Sesli komut özelliği Web Speech API kullanır. En iyi uyum için **Google Chrome** veya **Microsoft Edge** önerilir. Ses desteği olmayan tarayıcılarda metin tabanlı komut girişi kullanılabilir.
+- **Sesli komut (STT):** Web Speech API kullanır. En iyi uyum için **Google Chrome** veya **Microsoft Edge** önerilir. Desteklemeyen tarayıcılarda (ör. Firefox) mikrofon düğmesi gizlenir, metin girişi kullanılır. Chrome ses tanıma için internet bağlantısı ister.
+- **Sesli yanıt (TTS):** Piper Türkçe sesi tarayıcıda çalışır. Ses modeli (~63 MB) ilk kullanımda indirilir ve tarayıcıda saklanır; sonraki açılışlarda yeniden inmez. Model indirilemezse (ör. internet yok) tarayıcının yerleşik sesi kullanılır. Sesli yanıt asistan panelinden kapatılabilir.
 
 ---
 
@@ -129,6 +131,7 @@ Sesli komut özelliği Web Speech API kullanır. En iyi uyum için **Google Chro
 | Işık / açı koşullarında düşük model doğruluğu | Hazır pretrained ağırlıklar, Roboflow ile veri seti çeşitliliğinin artırılması |
 | Video işleme + LLM sorgularında gecikme | Frame skipping, asenkron kuyruklar |
 | Tarayıcıda ses tanıma kısıtlaması | Metin tabanlı komut girişi (fallback) |
+| Piper ses modeli inemez (internet yok) | Tarayıcının yerleşik sesi (`speechSynthesis`) |
 
 ---
 
@@ -140,6 +143,14 @@ Sesli komut özelliği Web Speech API kullanır. En iyi uyum için **Google Chro
 - [React Dokümantasyonu](https://react.dev/learn)
 - [Roboflow Blog](https://blog.roboflow.com/)
 - Papers with Code (video anomali tespiti makaleleri)
+- [Piper TTS](https://github.com/rhasspy/piper) ve tarayıcı paketi [`@mintplex-labs/piper-tts-web`](https://www.npmjs.com/package/@mintplex-labs/piper-tts-web)
+
+### Ses lisansı
+
+Sesli asistanın Türkçe sesi Piper `tr_TR-dfki-medium` modelidir. Model, DFKI'nin
+[MaryTTS `dfki-ot-data`](https://github.com/marytts/dfki-ot-data/) veri setiyle eğitilmiştir ve
+[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) lisanslıdır: ticari
+kullanılamaz, kaynak gösterilmelidir, türevler aynı lisansla paylaşılır.
 
 ---
 

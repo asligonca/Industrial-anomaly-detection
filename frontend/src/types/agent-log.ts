@@ -12,13 +12,16 @@ export interface AssistantQuery {
   query: string
 }
 
-/** Asistanın yanıtla birlikte yaptığı işlem. FE-12 (#25) önerisi. */
+/**
+ * Asistanın önerdiği işlem. **Yalnızca öneri:** uygulanmaz; kullanıcı onaylarsa ön yüz
+ * `PATCH /events/{id}/status` çağırır. `acknowledge_alarm` onaylanınca olay `reviewing` olur.
+ */
 export interface AssistantAction {
   type: 'acknowledge_alarm'
   event_id: number
 }
 
-/** `POST /assistant/query` yanıtı. FE-12 (#25) önerisi. */
+/** `POST /assistant/query` yanıtı. */
 export interface AssistantResponse {
   answer: string
   actions: AssistantAction[]

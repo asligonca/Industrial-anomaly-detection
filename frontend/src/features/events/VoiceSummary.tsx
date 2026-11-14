@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
-import { useSpeech } from './useSpeech'
+import { useSpeech } from '@/lib/speech/useSpeech'
 
 const BAR_COUNT = 40
 /** Tasarımdaki dalga: sabit, rastgele görünen yükseklikler (%). */
@@ -9,9 +9,10 @@ const bars = Array.from(
   (_, i) => 22 + Math.round(Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.6)) * 78),
 )
 
-/** Olayın sesli özeti: tarayıcının Türkçe sesiyle oynat / durdur. */
+/** Olayın sesli özeti: Piper Türkçe sesiyle (yoksa tarayıcının sesiyle) oynat / durdur. */
 export function VoiceSummary({ text }: { text: string }) {
-  const { supported, speaking, progress, speak, stop } = useSpeech()
+  const { supported, status, active, progress, download, speak, stop } = useSpeech()
+  const speaking = status === 'speaking'
   const played = speaking ? Math.round(progress * BAR_COUNT) : 0
 
   return (
@@ -24,13 +25,13 @@ export function VoiceSummary({ text }: { text: string }) {
       <div className="flex items-center gap-3.5">
         <button
           type="button"
-          onClick={() => (speaking ? stop() : speak(text))}
+          onClick={() => (active ? stop() : void speak(text))}
           disabled={!supported}
-          aria-label={speaking ? 'Durdur' : 'Oynat'}
+          aria-label={active ? 'Durdur' : 'Oynat'}
           className="grid size-11 flex-none place-items-center rounded-full bg-zinc-900 text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
         >
           <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            {speaking ? (
+            {active ? (
               <>
                 <rect x="6" y="5" width="4" height="14" />
                 <rect x="14" y="5" width="4" height="14" />
@@ -47,7 +48,7 @@ export function VoiceSummary({ text }: { text: string }) {
               className={cn(
                 'flex-1 rounded-xs',
                 i < played ? 'bg-zinc-900' : 'bg-zinc-300',
-                speaking && played === 0 && 'motion-safe:animate-pulse',
+                active && played === 0 && 'motion-safe:animate-pulse',
               )}
               style={{ height: `${height}%` }}
             />
@@ -55,6 +56,11 @@ export function VoiceSummary({ text }: { text: string }) {
         </div>
       </div>
 
+      {status === 'preparing' && download !== null && (
+        <p role="status" className="text-[13px] text-zinc-500">
+          {`Ses hazırlanıyor… %${Math.round(download * 100)} (ilk seferde bir kez iner)`}
+        </p>
+      )}
       <p className="text-sm leading-relaxed text-zinc-600">{text}</p>
       {!supported && (
         <p className="text-[13px] text-zinc-500">Bu tarayıcı sesli okumayı desteklemiyor.</p>

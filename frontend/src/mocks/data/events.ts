@@ -1,13 +1,13 @@
 import { eventCode } from '@/lib/labels'
 import { publicAssetUrl } from '@/lib/publicAssetUrl'
-import type { AnomalyEvent } from '@/types'
+import type { EventRow } from '../rows'
 import { atDay, today } from './time'
 
 // Mock'ta olay görseli, kameranın public/assets altındaki karesidir.
 // bbox: [x1, y1, x2, y2], görüntüye göre 0–1 arası. Açık olaylarınki karedeki çizili kutuyla örtüşür.
 // 14–5 bugünün olayları; 4–1 önceki günlerden kapanmış kayıtlar (Kayıtlar ekranı ve tarih filtresi için).
 
-export const events: AnomalyEvent[] = [
+export const events: EventRow[] = [
   {
     id: 14,
     code: eventCode(14),

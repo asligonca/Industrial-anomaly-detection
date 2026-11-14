@@ -1,16 +1,12 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { queryAssistant } from '../assistant'
-import { queryKeys } from '../queryKeys'
 
+/**
+ * Asistana soru sorar. Yanıttaki `actions` yalnızca öneridir; asistan hiçbir şeyi değiştirmez,
+ * bu yüzden önbellek yenilenmez. Öneri onaylanınca `useUpdateEventStatus` çalışır.
+ */
 export function useAssistantQuery() {
-  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (query: string) => queryAssistant({ query }),
-    onSuccess: (data) => {
-      // Asistan bir alarmı kapattıysa olay listesi değişti.
-      if (data.actions.some((a) => a.type === 'acknowledge_alarm')) {
-        return queryClient.invalidateQueries({ queryKey: queryKeys.events.all })
-      }
-    },
   })
 }

@@ -1,5 +1,4 @@
-import { cn } from '@/lib/cn'
-import { buttonVariants } from './buttonStyles'
+import { chipClass } from './chipStyles'
 
 export interface FilterOption<T extends string> {
   value: T
@@ -31,13 +30,7 @@ export function FilterChips<T extends string>({
             type="button"
             aria-pressed={selected}
             onClick={() => onChange(option.value)}
-            className={cn(
-              // Seçili: birincil düğme, değil: ikincil düğme renkleri. Kenarlık ikisinde de var ki
-              // seçim değişince yükseklik kaymasın.
-              'h-[38px] rounded-full border px-4 text-sm font-medium whitespace-nowrap',
-              selected ? 'border-zinc-900' : 'border-zinc-300',
-              buttonVariants[selected ? 'primary' : 'secondary'],
-            )}
+            className={chipClass('md', selected)}
           >
             {option.label}
           </button>

@@ -1,5 +1,5 @@
-import { isOpenStatus } from '@/lib/labels'
-import type { AnomalyEvent, Severity } from '@/types'
+import { isOpenStatus, severityRank } from '@/lib/eventRules'
+import type { AnomalyEvent } from '@/types'
 
 /** Kamera kartında gösterilen açık olay ve o kameradaki diğer açık olay sayısı. */
 export interface CameraHighlight {
@@ -7,8 +7,6 @@ export interface CameraHighlight {
   /** Gösterilen olay dışındaki açık olay sayısı; etikette "+N" olur. */
   others: number
 }
-
-const severityRank: Record<Severity, number> = { critical: 3, high: 2, medium: 1, info: 0 }
 
 /** Önemi yüksek olan önce; eşitse yeni olan. */
 function outranks(a: AnomalyEvent, b: AnomalyEvent): boolean {

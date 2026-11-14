@@ -1,5 +1,4 @@
 import { ApiError } from '@/api/client'
-import { useCameras } from '@/api/hooks/useCameras'
 import { useEvent } from '@/api/hooks/useEvent'
 import { SeverityBadge, StatusBadge } from '@/components/ui/Badge'
 import { LinkButton } from '@/components/ui/Button'
@@ -7,12 +6,15 @@ import { EmptyState } from '@/components/ui/EmptyState'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { formatConfidence } from '@/lib/format'
-import { cameraCode, eventCode, eventTypeLabel, isOpenStatus } from '@/lib/labels'
+import { isOpenStatus } from '@/lib/eventRules'
+import { cameraCode, eventCode, eventTypeLabel } from '@/lib/labels'
 import type { EventDetail } from '@/types'
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { AgentTimeline } from './AgentTimeline'
 import { EventSnapshot } from './EventSnapshot'
 import { EventStatusActions } from './EventStatusActions'
+import { StatusHistory } from './StatusHistory'
 import { SuggestedActions } from './SuggestedActions'
 import { voiceSummaryText } from './voiceSummaryText'
 import { VoiceSummary } from './VoiceSummary'
@@ -71,10 +73,13 @@ function MetaItem({ label, value }: { label: string; value: string }) {
   )
 }
 
-function EventDetailView({ event, cameraName }: { event: EventDetail; cameraName?: string }) {
+function EventDetailView({ event }: { event: EventDetail }) {
   const type = eventTypeLabel(event.type)
   const code = cameraCode(event.camera_id)
+  const cameraName = event.camera.name
   const open = isOpenStatus(event.status)
+  // "Bugün / Dün" için sabit an: geçmiş listesi her saniye yeniden çizilmesin.
+  const [openedAt] = useState(() => new Date())
 
   return (
     <div className="flex flex-col gap-6">
@@ -82,7 +87,7 @@ function EventDetailView({ event, cameraName }: { event: EventDetail; cameraName
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
           <SeverityBadge severity={event.severity} size="lg" />
           <h1 className="text-[28px] font-bold tracking-tight">
-            {type} · {cameraName ?? code}
+            {type} · {cameraName}
           </h1>
           <StatusBadge status={event.status} />
         </div>
@@ -91,36 +96,33 @@ function EventDetailView({ event, cameraName }: { event: EventDetail; cameraName
 
       <div className="flex flex-wrap items-start gap-6">
         <div className="flex min-w-0 flex-[3_1_520px] flex-col gap-4">
-          <EventSnapshot event={event} cameraName={cameraName} />
+          <EventSnapshot event={event} />
           <dl className="grid grid-cols-[repeat(auto-fit,minmax(150px,1fr))] gap-3">
             <MetaItem label="Tespit modeli" value={event.model_version} />
             <MetaItem label="Güven skoru" value={formatConfidence(event.confidence)} />
             <MetaItem label="Kamera" value={code} />
             <MetaItem label="Bölge" value={event.zone?.name ?? '—'} />
           </dl>
-          <VoiceSummary text={voiceSummaryText(event, cameraName ?? code)} />
+          <VoiceSummary text={voiceSummaryText(event, cameraName)} />
         </div>
 
         <div className="flex min-w-0 flex-[2_1_340px] flex-col gap-4">
           <AgentTimeline eventId={event.id} />
           <SuggestedActions event={event} disabled={!open} />
+          <StatusHistory actions={event.actions} now={openedAt} />
         </div>
       </div>
     </div>
   )
 }
 
-/** Olay detayı: görüntü, meta, durum düğmeleri, ajan analizi, aksiyonlar, sesli özet. */
+/** Olay detayı: görüntü, meta, durum düğmeleri, ajan analizi, aksiyonlar, durum geçmişi, sesli özet. */
 export function EventDetailPage() {
   const params = useParams()
   const id = parseId(params.id)
   const event = useEvent(id)
-  const cameras = useCameras()
 
   const notFound = id === null || (event.error instanceof ApiError && event.error.status === 404)
-  const cameraName = event.data
-    ? cameras.data?.find((c) => c.id === event.data.camera_id)?.name
-    : undefined
 
   return (
     <section className="flex flex-col gap-6">
@@ -133,7 +135,7 @@ export function EventDetailPage() {
         <ErrorBox message="Olay yüklenemedi." onRetry={() => void event.refetch()} />
       ) : (
         // key: başka olaya geçince görüntü hatası ve ses durumu sıfırlansın.
-        <EventDetailView key={event.data.id} event={event.data} cameraName={cameraName} />
+        <EventDetailView key={event.data.id} event={event.data} />
       )}
     </section>
   )

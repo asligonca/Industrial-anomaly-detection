@@ -1,9 +1,7 @@
-import { useCameras } from '@/api/hooks/useCameras'
 import { OPEN_EVENTS_LIMIT, useOpenEvents } from '@/api/hooks/useOpenEvents'
 import { ErrorBox } from '@/components/ui/ErrorBox'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Skeleton } from '@/components/ui/Skeleton'
-import { useMemo } from 'react'
 import { EventListItem } from './EventListItem'
 
 const SKELETON_COUNT = 3
@@ -11,12 +9,6 @@ const SKELETON_COUNT = 3
 /** Bekleyen (açık + inceleniyor) olaylar, en yeni önce. */
 export function EventsPage() {
   const events = useOpenEvents()
-  const cameras = useCameras()
-
-  const cameraNames = useMemo(
-    () => new Map((cameras.data ?? []).map((c) => [c.id, c.name])),
-    [cameras.data],
-  )
 
   const total = events.data?.total
   const shown = events.data?.items.length ?? 0
@@ -46,11 +38,7 @@ export function EventsPage() {
         <>
           <ul className="flex flex-col gap-3">
             {events.data.items.map((event) => (
-              <EventListItem
-                key={event.id}
-                event={event}
-                cameraName={cameraNames.get(event.camera_id)}
-              />
+              <EventListItem key={event.id} event={event} />
             ))}
           </ul>
           {total !== undefined && total > shown && (

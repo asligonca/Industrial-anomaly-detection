@@ -1,4 +1,4 @@
-import { OPEN_STATUSES } from '@/lib/labels'
+import { OPEN_STATUSES } from '@/lib/eventRules'
 import { useEvents } from './useEvents'
 
 /** API'nin izin verdiği en büyük sayfa. Açık olay bundan fazlaysa en yeni 200'ü gelir. */

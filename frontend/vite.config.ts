@@ -11,6 +11,10 @@ export default defineConfig({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  // Piper worker'ı (lib/speech) ONNX'i dinamik import ile yükler; kod bölme için ES modül worker.
+  worker: {
+    format: 'es',
+  },
   // Backend CORS yalnızca http://localhost:5173'e izin verir.
   // Port doluysa sessizce başka porta geçmesin, hata versin.
   server: {

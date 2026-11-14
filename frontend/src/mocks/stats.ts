@@ -1,8 +1,9 @@
 import { HOURS_PER_DAY, toDateInputValue } from '@/lib/format'
-import type { AnomalyEvent, EventStats } from '@/types'
+import type { EventStats } from '@/types'
+import type { EventRow } from './rows'
 
 /** Anahtara göre sayar, en çoktan aza sıralar. Eşitlikte ilk görülen önde kalır. */
-function countBy<K>(events: AnomalyEvent[], key: (e: AnomalyEvent) => K): [K, number][] {
+function countBy<K>(events: EventRow[], key: (e: EventRow) => K): [K, number][] {
   const counts = new Map<K, number>()
   for (const event of events) counts.set(key(event), (counts.get(key(event)) ?? 0) + 1)
   return [...counts].sort((a, b) => b[1] - a[1])
@@ -13,7 +14,7 @@ function countBy<K>(events: AnomalyEvent[], key: (e: AnomalyEvent) => K): [K, nu
  * Saat ve gün tarayıcının yerel saatine göre (backend'de tesisin saat dilimi).
  * `by_hour` her zaman 24 kayıt; tespit olmayan saat 0.
  */
-export function buildEventStats(events: AnomalyEvent[]): EventStats {
+export function buildEventStats(events: EventRow[]): EventStats {
   const hourly = Array.from({ length: HOURS_PER_DAY }, () => 0)
   for (const event of events) {
     const hour = new Date(event.created_at).getHours()

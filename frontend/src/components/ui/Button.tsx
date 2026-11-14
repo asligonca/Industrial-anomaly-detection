@@ -1,6 +1,13 @@
 import type { ComponentProps } from 'react'
 import { Link } from 'react-router-dom'
-import { buttonClass, type ButtonSize, type ButtonVariant } from './buttonStyles'
+import {
+  buttonClass,
+  iconButtonClass,
+  type ButtonSize,
+  type ButtonVariant,
+  type IconButtonSize,
+  type IconButtonVariant,
+} from './buttonStyles'
 
 interface ButtonProps extends ComponentProps<'button'> {
   variant?: ButtonVariant
@@ -31,4 +38,30 @@ export function LinkButton({
   ...rest
 }: LinkButtonProps) {
   return <Link className={buttonClass(variant, size, className)} {...rest} />
+}
+
+interface IconButtonProps extends Omit<ComponentProps<'button'>, 'aria-label'> {
+  /** Ekran okuyucu adı; ikon düğmesinde görünür yazı olmadığı için zorunlu. */
+  label: string
+  variant?: IconButtonVariant
+  size?: IconButtonSize
+}
+
+/** Yalnızca ikonlu düğme (ses aç/kapat, kapat ×, mikrofon). */
+export function IconButton({
+  label,
+  variant = 'ghost',
+  size = 'sm',
+  type = 'button',
+  className,
+  ...rest
+}: IconButtonProps) {
+  return (
+    <button
+      type={type}
+      aria-label={label}
+      className={iconButtonClass(variant, size, className)}
+      {...rest}
+    />
+  )
 }

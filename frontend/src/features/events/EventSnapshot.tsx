@@ -19,16 +19,12 @@ function bboxStyle([x1, y1, x2, y2]: BBox): CSSProperties {
   }
 }
 
-interface EventSnapshotProps {
-  event: AnomalyEvent
-  cameraName?: string
-}
-
 /**
  * Olay anındaki kare ve tespit kutusu. Görüntü kendi en-boy oranıyla çizilir (kırpılmaz);
  * böylece normalize `bbox` doğru yere düşer.
  */
-export function EventSnapshot({ event, cameraName }: EventSnapshotProps) {
+export function EventSnapshot({ event }: { event: AnomalyEvent }) {
+  const cameraName = event.camera.name
   const [failed, setFailed] = useState(false)
   const type = eventTypeLabel(event.type)
   const src = eventSnapshotUrl(event)
@@ -43,7 +39,7 @@ export function EventSnapshot({ event, cameraName }: EventSnapshotProps) {
         <div className="relative">
           <img
             src={src}
-            alt={`${type} tespiti${cameraName ? `, ${cameraName}` : ''}`}
+            alt={`${type} tespiti, ${cameraName}`}
             onError={() => setFailed(true)}
             className="block h-auto w-full"
           />
@@ -58,9 +54,7 @@ export function EventSnapshot({ event, cameraName }: EventSnapshotProps) {
       <figcaption className="pointer-events-none absolute inset-x-0 top-0 flex justify-between gap-4 bg-linear-to-b from-zinc-900/80 to-transparent px-[18px] pt-3.5 pb-6">
         <div className="min-w-0">
           <div className="font-mono text-xs text-camera-code">{cameraCode(event.camera_id)}</div>
-          {cameraName && (
-            <div className="truncate text-base font-semibold text-white">{cameraName}</div>
-          )}
+          <div className="truncate text-base font-semibold text-white">{cameraName}</div>
         </div>
         <time dateTime={event.created_at} className="flex-none font-mono text-xs text-zinc-200">
           {formatDateTime(new Date(event.created_at))}

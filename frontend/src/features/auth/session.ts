@@ -1,5 +1,7 @@
 import { setTokenProvider, setUnauthorizedHandler } from '@/api/client'
+import { stopSpeech } from '@/lib/speech/player'
 import { queryClient } from '@/queryClient'
+import { useAssistantStore } from '@/store/assistant'
 import { useAuthStore } from '@/store/auth'
 import { useUiStore } from '@/store/ui'
 import type { SessionUser } from '@/types'
@@ -14,6 +16,8 @@ export function startSession(token: string, user: SessionUser) {
 export function endSession() {
   useAuthStore.getState().clearSession()
   useUiStore.getState().closeAssistant()
+  useAssistantStore.getState().resetConversation()
+  stopSpeech()
   queryClient.clear()
 }
 
