@@ -2,7 +2,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
-![YOLO](https://img.shields.io/badge/YOLOv8%20%2F%20YOLOv11-Ultralytics-00FFFF)
+![YOLO](https://img.shields.io/badge/YOLO26-Ultralytics-00FFFF)
 ![React](https://img.shields.io/badge/React-Vite-61DAFB?logo=react&logoColor=black)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?logo=tailwindcss&logoColor=white)
 ![Gemini](https://img.shields.io/badge/Google-Gemini%20API-4285F4?logo=google&logoColor=white)
@@ -45,7 +45,7 @@ Endüstriyel tesislerde ve kritik alanlarda güvenlik kameralarından alınan ca
 **Backend**
 - Python
 - FastAPI
-- Ultralytics YOLOv8 / YOLOv11
+- Ultralytics YOLO26
 - OpenCV
 - SQLAlchemy
 - SQLite (geliştirme) / PostgreSQL (üretim)

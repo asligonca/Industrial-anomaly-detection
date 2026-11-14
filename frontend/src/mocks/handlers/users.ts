@@ -11,6 +11,7 @@ import {
   paginate,
   readJsonObject,
   readPage,
+  sameUsername,
 } from '../utils'
 
 /** Backend kuralı (madde 28). */
@@ -39,7 +40,8 @@ export const userHandlers = [
       if (!roles.includes(body.role as Role)) {
         return errorResponse(422, `role must be one of: ${roles.join(', ')}`)
       }
-      if (db.users.some((u) => u.username === username)) {
+      // Kullanıcı adı büyük/küçük harfe duyarsız tekil: "Admin" ile "admin" aynı kişi (madde 31).
+      if (db.users.some((u) => sameUsername(u.username, username))) {
         return errorResponse(409, 'Username already exists')
       }
 

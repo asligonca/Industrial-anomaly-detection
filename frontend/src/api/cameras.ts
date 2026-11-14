@@ -1,10 +1,14 @@
 import { config } from '@/config'
 import { publicAssetUrl } from '@/lib/publicAssetUrl'
-import type { Camera, CameraCreate, CameraUpdate } from '@/types'
+import type { Camera, CameraCreate, CameraUpdate, Paginated } from '@/types'
 import { apiBaseUrl, apiRequest, withToken } from './client'
 
+/**
+ * Liste uçları sayfalı zarf döner. Kamera sayısı az: tek istekte en çok 200 (backend üst sınırı).
+ * `useCameras` yalnızca `.items`'ı önbelleğe alır.
+ */
 export function getCameras(signal?: AbortSignal) {
-  return apiRequest<Camera[]>('/cameras', { signal })
+  return apiRequest<Paginated<Camera>>('/cameras', { query: { limit: 200 }, signal })
 }
 
 /** Yalnızca admin. */

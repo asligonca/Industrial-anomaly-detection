@@ -1,8 +1,9 @@
-import type { Zone, ZoneCreate } from '@/types'
+import type { Paginated, Zone, ZoneCreate } from '@/types'
 import { apiRequest } from './client'
 
+/** Sayfalı zarf; bölge sayısı az, tek istekte en çok 200. `useZones` `.items`'ı döner. */
 export function getZones(signal?: AbortSignal) {
-  return apiRequest<Zone[]>('/zones', { signal })
+  return apiRequest<Paginated<Zone>>('/zones', { query: { limit: 200 }, signal })
 }
 
 /** Yalnızca admin. */

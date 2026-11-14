@@ -25,9 +25,13 @@ export function CameraRow({ camera }: { camera: Camera }) {
         <span className={cn('font-medium', !camera.is_active && 'text-zinc-500')}>
           {camera.name}
         </span>
-        <span title={url} className="truncate font-mono text-[12px] text-zinc-500">
-          {url}
-        </span>
+        {url ? (
+          <span title={url} className="truncate font-mono text-[12px] text-zinc-500">
+            {url}
+          </span>
+        ) : (
+          <span className="text-[12px] text-zinc-400">Yayın adresi yok</span>
+        )}
       </div>
       <div className="flex flex-col items-end gap-1">
         <Switch

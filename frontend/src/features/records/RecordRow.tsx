@@ -2,7 +2,7 @@ import { eventSnapshotUrl } from '@/api/events'
 import { SeverityBadge } from '@/components/ui/Badge'
 import { LinkButton } from '@/components/ui/Button'
 import { formatConfidence, formatDay, formatTime, isSameDay } from '@/lib/format'
-import { cameraCode, eventCode, eventTypeLabel } from '@/lib/labels'
+import { cameraCode, eventTypeLabel } from '@/lib/labels'
 import type { AnomalyEvent } from '@/types'
 import { useState } from 'react'
 import { StatusMenu } from './StatusMenu'
@@ -18,18 +18,19 @@ interface RecordRowProps {
 /** Kayıtlar tablosunun tek satırı. */
 export function RecordRow({ event, cameraName, now }: RecordRowProps) {
   const [imageFailed, setImageFailed] = useState(false)
+  const snapshot = eventSnapshotUrl(event)
   const created = new Date(event.created_at)
   const type = eventTypeLabel(event.type)
-  const code = eventCode(event.id)
+  const code = event.code
 
   return (
     <tr className="border-b border-zinc-100 last:border-b-0">
       <td className="py-2.5 pr-4 pl-5">
-        {/* Görüntü yüklenemezse koyu zemin kalır; bilgi diğer sütunlarda var. */}
+        {/* Görüntü yoksa ya da yüklenemezse koyu zemin kalır; bilgi diğer sütunlarda var. */}
         <div className="h-11 w-[72px] overflow-hidden rounded-md bg-zinc-800">
-          {!imageFailed && (
+          {snapshot && !imageFailed && (
             <img
-              src={eventSnapshotUrl(event)}
+              src={snapshot}
               alt=""
               loading="lazy"
               onError={() => setImageFailed(true)}

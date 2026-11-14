@@ -8,6 +8,7 @@ import {
   invalidBody,
   networkDelay,
   readJsonObject,
+  sameUsername,
 } from '../utils'
 
 /** Gövdeyi hem JSON hem form-encoded (FastAPI OAuth2 kalıbı) olarak okur. Okunamazsa null. */
@@ -28,7 +29,8 @@ export const authHandlers = [
 
     const user = db.users.find(
       (u) =>
-        u.username === credentials.username && db.passwords[u.username] === credentials.password,
+        sameUsername(u.username, credentials.username) &&
+        db.passwords[u.username] === credentials.password,
     )
     if (!user) return errorResponse(401, 'Incorrect username or password')
 

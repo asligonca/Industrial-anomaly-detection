@@ -1,4 +1,4 @@
-import { eventCode, eventTypeLabel, isOpenStatus } from '@/lib/labels'
+import { eventTypeLabel, isOpenStatus } from '@/lib/labels'
 import type { AnomalyEvent, AssistantResponse, User } from '@/types'
 import { http, HttpResponse } from 'msw'
 import { addAgentLog, db, setEventStatus } from '../db'
@@ -22,7 +22,7 @@ function respond(query: string, user: User): AssistantResponse {
     if (!event) return { answer: 'Kapatılacak açık olay yok.', actions: [] }
     setEventStatus(event, 'confirmed', user, 'Sesli asistan ile kapatıldı')
     return {
-      answer: `${eventCode(event.id)} kapatıldı (${eventTypeLabel(event.type)}, ${cameraName(event.camera_id)}).`,
+      answer: `${event.code} kapatıldı (${eventTypeLabel(event.type)}, ${cameraName(event.camera_id)}).`,
       actions: [{ type: 'acknowledge_alarm', event_id: event.id }],
     }
   }

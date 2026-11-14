@@ -9,23 +9,32 @@ import {
   invalidBody,
   maskStreamPassword,
   nonEmptyString,
+  paginate,
   parseId,
   readJsonObject,
+  readPage,
 } from '../utils'
 
-/** Boş bırakılamayan metin alanları (`location` boş olabilir). */
+/** Formda zorunlu metin alanları (`location` boş olabilir). */
 const requiredTextFields = ['name', 'area', 'stream_url'] as const
+
+/** Backend gibi: boş konum `null` olarak saklanır. */
+const optionalText = (value: string) => value.trim() || null
 
 /** Yanıt: parola maskeli. `db` gerçek adresi tutar (backend'in veritabanı gibi). */
 const toResponse = (camera: Camera): Camera => ({
   ...camera,
-  stream_url: maskStreamPassword(camera.stream_url),
+  stream_url: camera.stream_url && maskStreamPassword(camera.stream_url),
 })
 
 export const cameraHandlers = [
   http.get(
     apiPath('/cameras'),
-    authed(() => HttpResponse.json(db.cameras.map(toResponse))),
+    authed(({ request }) => {
+      const page = readPage(new URL(request.url).searchParams)
+      if (page instanceof Response) return page
+      return HttpResponse.json(paginate(db.cameras.map(toResponse), page))
+    }),
   ),
 
   http.post(
@@ -44,7 +53,7 @@ export const cameraHandlers = [
         id,
         code: cameraCode(id),
         name,
-        location: typeof body.location === 'string' ? body.location.trim() : '',
+        location: typeof body.location === 'string' ? optionalText(body.location) : null,
         stream_url: streamUrl,
         is_active: typeof body.is_active === 'boolean' ? body.is_active : true,
         area,
@@ -80,7 +89,7 @@ export const cameraHandlers = [
         const value = nonEmptyString(body[field])
         if (value) camera[field] = value
       }
-      if (typeof body.location === 'string') camera.location = body.location.trim()
+      if (typeof body.location === 'string') camera.location = optionalText(body.location)
       if (typeof body.is_active === 'boolean') camera.is_active = body.is_active
 
       const target = { type: 'camera', id } as const

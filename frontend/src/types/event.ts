@@ -21,17 +21,21 @@ export type BBox = [number, number, number, number]
 /** `anomaly_events` tablosunun Read şeması. */
 export interface AnomalyEvent {
   id: number
+  /** Backend id'den üretir: 14 -> "OLY-014" (DB'de tutulmaz). */
+  code: string
   camera_id: number
   zone_id: number | null
   type: EventType
   confidence: number
   severity: Severity
   bbox: BBox
-  /** Sunucudaki dosya yolu (tablo sütunu). Ekranda kullanılmaz. */
-  snapshot_path: string
-  /** Görüntünün adresi. `<img>` için `eventSnapshotUrl` ile token eklenir. */
-  snapshot_url: string
-  track_id: number
+  /**
+   * Görüntünün adresi (`/api/events/{id}/snapshot`); görüntü yoksa `null`. `<img>` için
+   * `eventSnapshotUrl` ile token eklenir. Sunucudaki dosya yolu (`snapshot_path`) API'de dönmez.
+   */
+  snapshot_url: string | null
+  /** Takip yapılmayan tespitlerde `null`. */
+  track_id: number | null
   status: EventStatus
   created_at: string
 }
