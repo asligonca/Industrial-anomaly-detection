@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 
 interface UiState {
-  /** Sesli asistan paneli açık mı. Paneli FE-10 çizer; FE-4 yalnızca bayrağı tutar. */
+  /** Sesli asistan paneli açık mı (`features/assistant`). */
   assistantOpen: boolean
   toggleAssistant: () => void
   closeAssistant: () => void

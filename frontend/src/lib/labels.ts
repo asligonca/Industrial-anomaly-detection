@@ -2,7 +2,15 @@
  * API kodu -> ekran etiketi. API'ye her zaman kod gider, ekrana her zaman etiket çıkar.
  * Backend kodları değiştirirse yalnızca bu dosya ve `src/types` güncellenir.
  */
-import type { AgentName, EventStatus, EventType, Role, RuleType, Severity } from '@/types'
+import type {
+  AgentName,
+  AssistantAction,
+  EventStatus,
+  EventType,
+  Role,
+  RuleType,
+  Severity,
+} from '@/types'
 
 export const eventTypeLabels: Record<EventType, string> = {
   restricted_zone: 'Yasak bölge',
@@ -69,6 +77,17 @@ export const ruleTypes = Object.keys(ruleTypeLabels) as RuleType[]
 export const OPEN_STATUSES: EventStatus[] = ['new', 'reviewing']
 
 export const isOpenStatus = (status: EventStatus) => OPEN_STATUSES.includes(status)
+
+/**
+ * Asistan önerisinin onay düğmesi ve onaylanınca olayın geçeceği durum. Sözleşme:
+ * `acknowledge_alarm` -> `reviewing` (backend-notlari madde 39).
+ */
+export const assistantActions: Record<
+  AssistantAction['type'],
+  { label: string; status: EventStatus; done: string }
+> = {
+  acknowledge_alarm: { label: 'İncelemeye al', status: 'reviewing', done: 'incelemeye alındı' },
+}
 
 export const agentLabels: Record<AgentName, string> = {
   watcher: 'Gözcü Ajan',
