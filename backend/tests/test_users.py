@@ -39,9 +39,9 @@ def test_create_user_duplicate_returns_409(client):
 def test_list_users_envelope(client):
     for name in ("a1", "a2", "a3"):
         client.post("/api/users", json={"username": name, "password": "parola123"})
-    body = client.get("/api/users", params={"limit": 2, "offset": 1}).json()
-    assert body["total"] == 3
+    body = client.get("/api/users", params={"limit": 2, "offset": 2}).json()
+    assert body["total"] == 4
     assert body["limit"] == 2
-    assert body["offset"] == 1
+    assert body["offset"] == 2
     assert [u["username"] for u in body["items"]] == ["a2", "a3"]
     assert all("password_hash" not in u for u in body["items"])

@@ -10,6 +10,9 @@ CameraArea = Annotated[str, Field(min_length=1, max_length=50, description="Kame
 CameraLocation = Annotated[str, Field(max_length=255, description="Kameranın tam yeri")]
 StreamUrl = Annotated[str, Field(min_length=1, max_length=500, description="RTSP adresi ya da video dosyası yolu")]
 
+MASK = "***"
+"""Yanıtta parolanın yerine yazılan işaret."""
+
 
 def mask_stream_url(url: str | None) -> str | None:
     """Adresteki parolayı `***` ile değiştirir: `rtsp://user:pass@host` → `rtsp://user:***@host`."""
@@ -20,7 +23,7 @@ def mask_stream_url(url: str | None) -> str | None:
         return url
     userinfo, _, hostinfo = parts.netloc.rpartition("@")
     username = userinfo.split(":", 1)[0]
-    return urlunsplit(parts._replace(netloc=f"{username}:***@{hostinfo}"))
+    return urlunsplit(parts._replace(netloc=f"{username}:{MASK}@{hostinfo}"))
 
 
 def camera_code(camera_id: int) -> str:
