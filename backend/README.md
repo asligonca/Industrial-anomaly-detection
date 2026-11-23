@@ -21,6 +21,12 @@ alembic upgrade head
 python -m app.scripts.create_admin --username admin
 ```
 
+Geliştirme verisi (3 kamera, bölgeler, 50 olay; demo girişleri `admin / admin1234`, `operator / operator1234`).
+Tekrar çalıştırılınca veriyi çoğaltmaz, var olan kullanıcıların parolasına dokunmaz:
+```powershell
+python -m app.scripts.seed
+```
+
 ## Veritabanı (Alembic)
 Şema yalnızca migration ile değişir; tablolar `alembic upgrade head` ile oluşur.
 

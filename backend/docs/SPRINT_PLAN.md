@@ -45,7 +45,7 @@ Tablolar (FE-12 / #25 kararları işlendi):
 | `cameras` | id, name, area, location, stream_url, is_active, created_at | `area` serbest metin (String(50)); silme = soft delete (`is_active=False`); `code` ("KAM-03") DB'de yok, yanıtta `id`'den üretilir; `stream_url` içindeki parola yanıtta maskelenir (`rtsp://kullanici:***@...`) |
 | `zones` | id, camera_id → cameras, name, polygon (JSON), rule_type, is_active | silme = soft delete (`is_active=False`), eski olaylar bölgesini kaybetmesin diye; polygon `[[x, y], ...]`, 0–1 normalize; liste varsayılan olarak yalnızca aktif bölgeleri döner; rule_type enum: restricted, ppe_helmet_vest, ppe_helmet, ppe_vest, forklift_proximity, smoke_fire, person_near_equipment (Cudi ile netleşecek) |
 | `anomaly_events` | id, camera_id, zone_id, type, severity, confidence, bbox (JSON), snapshot_path, track_id, model_version, status, created_at | status: `new` / `reviewing` / `confirmed` / `false_alarm`; severity: `critical` / `high` / `medium` / `info` (backend `type`'tan doldurur); `bbox` = `[x1, y1, x2, y2]`, 0–1 normalize; `code` ("OLY-014") ve `snapshot_url` DB'de yok, yanıtta üretilir; `type` enum'u şimdilik restricted_zone, no_helmet, no_vest (diğerleri Cudi ile netleşince; `smoke_fire`/`smoke_detected` adı tekleşecek) |
-| `alarm_actions` | id, event_id, user_id, from_status, to_status, note, created_at | olayın durum geçmişi; `GET /api/events/{id}` yanıtında `actions` olarak döner |
+| `alarm_actions` | id, event_id, user_id, from_status, to_status, note, created_at | olayın durum geçmişi; `GET /api/events/{id}` yanıtında `actions` olarak döner. Yanıt biçimi: `{id, event_id, from_status, to_status, note, user: {id, username} \| null, created_at}` (`user_id` yerine `user`; kullanıcı silinmişse `null`), eskiden yeniye |
 | `agent_logs` | id, user_id, query, response, created_at | Sprint 4'te doldurulacak |
 | `audit_logs` | id, user_id (null olabilir), action, target_type, target_id, details (JSON), created_at | Sprint 2'de; yönetim işlemleri ve durum değişiklikleri |
 
@@ -59,22 +59,22 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [x] PR #27 (`Refs #25`) main'e birleştirildi (merge commit `0e73726`)
 
 ### 2. hafta — şemalar ve uçlar
-- [ ] Her tablo için Pydantic şemaları: `Create`, `Update`, `Read` (kamera, bölge, kullanıcı ✓; olay ve alarm kaydı kaldı)
+- [x] Her tablo için Pydantic şemaları: `Create`, `Update`, `Read` (olay ve alarm kaydı için yalnızca `Read`; olayı dedektör oluşturur, Sprint 3)
 - [x] CRUD uçları (`/api` önekiyle), tüm listeler `{items, total, limit, offset}`:
   - `GET /api/cameras`, `POST /api/cameras` `{name, area, location?, stream_url, is_active?}` → 201, `PATCH /api/cameras/{id}` (kısmi) → 200
   - Kamera yanıtında `code` ("KAM-03") ve maskeli `stream_url`; PATCH'te `stream_url` gönderilmezse eskisi korunur
   - `GET /api/zones` (yalnızca aktifler), `POST /api/zones` `{name, camera_id, rule_type, polygon}` → 201 (polygon zorunlu), `DELETE /api/zones/{id}` → 204, soft delete
-- [ ] `GET /api/events`: filtre + sayfalama, yanıt `{items, total}`
+- [x] `GET /api/events`: filtre + sayfalama, yanıt `{items, total, limit, offset}`; ek olarak `zone_id` (çoklu) filtresi; bilinmeyen `type` 422 değil boş sonuç
   - Filtreler: `camera_id`, `area`, `from`/`to`; çoklu değer tekrar eden parametreyle (`?status=new&status=reviewing`, `?severity=high&severity=critical`, `?type=no_helmet&type=no_vest`)
   - `from`/`to` saat dilimli ISO tarih-saat; backend UTC'ye çevirir; `to` dahil
   - `q` araması: olay kodu (`OLY-014` ya da `14`), kamera adı ve kamera kodu (`KAM-03`); Türkçe tür adlarını ön yüz tür koduna çevirir
   - `total` = filtrelenmiş toplam
   - Sıralama: `?sort=-created_at` (varsayılan); izinli alanlar `created_at`, `severity` (critical > high > medium > info), `confidence`
   - Liste öğesi: `code`, `camera: {id, name, area}`, `snapshot_url` dahil (`selectinload` ile, N+1 olmadan)
-- [ ] `GET /api/events/{id}`: ayrıca `zone: {id, name} | null`, `model_version`, `bbox`, `actions` geçmişi
-- [ ] `GET /api/events/stats`: `by_type`, `by_camera`, `by_day`, `by_hour`; gruplama İstanbul saatine göre, `by_hour` her zaman 24 kayıt (boş saatler 0), `from`/`to` uygulanır
-- [ ] SQLite'tan gelen tarihleri yanıtta UTC (`Z`) olarak döndür
-- [ ] `seed.py`: 3 kamera, 50 sahte olay (`model_version`, `bbox` dolu); demo kullanıcılar en az 8 karakterli parolayla (ör. `admin1234`)
+- [x] `GET /api/events/{id}`: ayrıca `zone: {id, name} | null`, `model_version`, `bbox`, `actions` geçmişi
+- [x] `GET /api/events/stats`: `by_type`, `by_camera`, `by_day`, `by_hour`; gruplama İstanbul saatine göre, `by_hour` her zaman 24 kayıt (boş saatler 0), `from`/`to` uygulanır
+- [x] SQLite'tan gelen tarihleri yanıtta UTC (`Z`) olarak döndür
+- [x] `seed.py`: 3 kamera, 50 sahte olay (`model_version`, `bbox` dolu); demo kullanıcılar en az 8 karakterli parolayla (ör. `admin1234`)
 - [x] `pytest` + `TestClient` ile ilk testler (`requirements-dev.txt`; kamera, bölge, kullanıcı uçları)
 - [ ] ER diyagramı (dbdiagram.io) → forma ekle
 
