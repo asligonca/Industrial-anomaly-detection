@@ -6,3 +6,4 @@ alembic==1.20.1
 pwdlib[bcrypt]==0.4.2
 pyjwt==2.15.1
 python-multipart==0.0.34
+tzdata==2026.6
