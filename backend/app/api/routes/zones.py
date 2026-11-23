@@ -4,8 +4,10 @@ from sqlalchemy import select
 from app.api.deps import AdminUser, CurrentUser, DbSession, PaginationParams, paginate
 from app.api.errors import FORBIDDEN_RESPONSE, UNAUTHORIZED_RESPONSE, body_field_error
 from app.models import Camera, Zone
+from app.models.enums import AuditAction, AuditTargetType
 from app.schemas.common import Page
 from app.schemas.zone import ZoneCreate, ZoneRead
+from app.services.audit import record_audit
 
 router = APIRouter(prefix="/zones", tags=["zones"], responses=UNAUTHORIZED_RESPONSE)
 
@@ -24,7 +26,7 @@ def list_zones(db: DbSession, pagination: PaginationParams, _user: CurrentUser):
     summary="Bölge ekle",
     responses=FORBIDDEN_RESPONSE,
 )
-def create_zone(payload: ZoneCreate, db: DbSession, _admin: AdminUser):
+def create_zone(payload: ZoneCreate, db: DbSession, admin: AdminUser):
     """Yeni bölge ekler (yalnızca admin). Polygon zorunlu, noktalar 0–1 normalize. Kamera yoksa 422."""
     if db.get(Camera, payload.camera_id) is None:
         raise body_field_error(
@@ -32,6 +34,10 @@ def create_zone(payload: ZoneCreate, db: DbSession, _admin: AdminUser):
         )
     zone = Zone(**payload.model_dump())
     db.add(zone)
+    db.flush()
+    record_audit(
+        db, admin, AuditAction.zone_created, AuditTargetType.zone, zone.id, label=zone.name
+    )
     db.commit()
     db.refresh(zone)
     return zone
@@ -44,7 +50,7 @@ def create_zone(payload: ZoneCreate, db: DbSession, _admin: AdminUser):
     summary="Bölgeyi sil (soft delete)",
     responses={**FORBIDDEN_RESPONSE, 404: {"description": "Bölge bulunamadı ya da zaten silinmiş"}},
 )
-def delete_zone(zone_id: int, db: DbSession, _admin: AdminUser):
+def delete_zone(zone_id: int, db: DbSession, admin: AdminUser):
     """Bölgeyi pasif yapar (`is_active=False`, yalnızca admin); eski olaylar bölgesini kaybetmez.
 
     Bölge yoksa ya da zaten silinmişse 404.
@@ -53,4 +59,7 @@ def delete_zone(zone_id: int, db: DbSession, _admin: AdminUser):
     if zone is None or not zone.is_active:
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Bölge bulunamadı")
     zone.is_active = False
+    record_audit(
+        db, admin, AuditAction.zone_deactivated, AuditTargetType.zone, zone.id, label=zone.name
+    )
     db.commit()

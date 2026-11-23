@@ -1,6 +1,13 @@
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import BaseModel, ConfigDict, computed_field, model_validator
+from pydantic import (
+    AfterValidator,
+    BaseModel,
+    ConfigDict,
+    Field,
+    computed_field,
+    model_validator,
+)
 
 from app.models import AnomalyEvent
 from app.models.enums import EventSeverity, EventStatus, EventType
@@ -95,6 +102,25 @@ class EventRead(BaseModel):
     @property
     def code(self) -> str:
         return event_code(self.id)
+
+
+def _blank_to_none(value: str | None) -> str | None:
+    """Notu kırpar; boş ya da yalnızca boşluksa `None`."""
+    if value is None:
+        return None
+    value = value.strip()
+    return value or None
+
+
+class EventStatusUpdate(BaseModel):
+    """`PATCH /api/events/{id}/status` gövdesi. Boş not `null` kaydedilir."""
+
+    status: EventStatus
+    note: Annotated[
+        str | None,
+        Field(max_length=500, description="En fazla 500 karakter"),
+        AfterValidator(_blank_to_none),
+    ] = None
 
 
 class EventDetail(EventRead):

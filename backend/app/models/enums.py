@@ -34,6 +34,42 @@ EVENT_TYPE_SEVERITY: dict[EventType, EventSeverity] = {
 }
 
 
+EVENT_STATUS_TRANSITIONS: dict[EventStatus, frozenset[EventStatus]] = {
+    EventStatus.new: frozenset(
+        {EventStatus.reviewing, EventStatus.confirmed, EventStatus.false_alarm}
+    ),
+    EventStatus.reviewing: frozenset(
+        {EventStatus.new, EventStatus.confirmed, EventStatus.false_alarm}
+    ),
+    EventStatus.confirmed: frozenset({EventStatus.reviewing}),
+    EventStatus.false_alarm: frozenset({EventStatus.reviewing}),
+}
+"""İzin verilen olay durumu geçişleri; listede olmayan (aynı duruma geçiş dahil) 409."""
+
+
+class AuditAction(StrEnum):
+    """Denetim kaydı işlem kodları. DB'de düz metin; yeni kod migration gerektirmez."""
+
+    user_login = "user.login"
+    user_created = "user.created"
+    event_status_changed = "event.status_changed"
+    camera_created = "camera.created"
+    camera_updated = "camera.updated"
+    camera_activated = "camera.activated"
+    camera_deactivated = "camera.deactivated"
+    zone_created = "zone.created"
+    zone_deactivated = "zone.deactivated"
+
+
+class AuditTargetType(StrEnum):
+    """Denetim kaydının hedef türü. DB'de düz metin."""
+
+    user = "user"
+    event = "event"
+    camera = "camera"
+    zone = "zone"
+
+
 class ZoneRuleType(StrEnum):
     restricted = "restricted"
     ppe_helmet_vest = "ppe_helmet_vest"

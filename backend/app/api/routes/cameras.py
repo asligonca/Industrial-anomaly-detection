@@ -4,14 +4,17 @@ from sqlalchemy import select
 from app.api.deps import AdminUser, CurrentUser, DbSession, PaginationParams, paginate
 from app.api.errors import FORBIDDEN_RESPONSE, UNAUTHORIZED_RESPONSE, body_field_error
 from app.models import Camera
+from app.models.enums import AuditAction, AuditTargetType
 from app.schemas.camera import (
     MASK,
     CameraCreate,
     CameraRead,
     CameraUpdate,
+    camera_code,
     mask_stream_url,
 )
 from app.schemas.common import Page
+from app.services.audit import record_audit
 
 router = APIRouter(prefix="/cameras", tags=["cameras"], responses=UNAUTHORIZED_RESPONSE)
 
@@ -39,7 +42,7 @@ def list_cameras(db: DbSession, pagination: PaginationParams, _user: CurrentUser
     summary="Kamera ekle",
     responses=FORBIDDEN_RESPONSE,
 )
-def create_camera(payload: CameraCreate, db: DbSession, _admin: AdminUser):
+def create_camera(payload: CameraCreate, db: DbSession, admin: AdminUser):
     """Yeni kamera ekler (yalnızca admin). Yanıtta `code` üretilir ve `stream_url` maskelenir.
 
     `stream_url` içinde `***` varsa 422: maskeli bir adres kopyalanıp kaydedilemez.
@@ -48,6 +51,15 @@ def create_camera(payload: CameraCreate, db: DbSession, _admin: AdminUser):
         raise _masked_url_error(payload.stream_url)
     camera = Camera(**payload.model_dump())
     db.add(camera)
+    db.flush()
+    record_audit(
+        db,
+        admin,
+        AuditAction.camera_created,
+        AuditTargetType.camera,
+        camera.id,
+        label=camera_code(camera.id),
+    )
     db.commit()
     db.refresh(camera)
     return camera
@@ -59,11 +71,14 @@ def create_camera(payload: CameraCreate, db: DbSession, _admin: AdminUser):
     summary="Kamerayı güncelle",
     responses={**FORBIDDEN_RESPONSE, 404: {"description": "Kamera bulunamadı"}},
 )
-def update_camera(camera_id: int, payload: CameraUpdate, db: DbSession, _admin: AdminUser):
+def update_camera(camera_id: int, payload: CameraUpdate, db: DbSession, admin: AdminUser):
     """Kamerayı kısmen günceller (yalnızca admin); aktif/pasif için `{is_active}` gönderilir.
 
     `stream_url` gönderilmezse ya da yanıttaki maskeli hâliyle aynı gelirse eski adres korunur.
     Başka bir değer `***` içeriyorsa 422.
+
+    Denetim kaydı yalnızca gerçek değişiklikte yazılır: `is_active` değişirse
+    `camera.activated|deactivated`, başka bir alan değişirse `camera.updated` (ikisi birden olabilir).
     """
     camera = db.get(Camera, camera_id)
     if camera is None:
@@ -75,8 +90,17 @@ def update_camera(camera_id: int, payload: CameraUpdate, db: DbSession, _admin: 
             del changes["stream_url"]
         elif MASK in new_url:
             raise _masked_url_error(new_url)
-    for field, value in changes.items():
-        setattr(camera, field, value)
+    changed = {field for field, value in changes.items() if getattr(camera, field) != value}
+    for field in changed:
+        setattr(camera, field, changes[field])
+    label = camera_code(camera.id)
+    if "is_active" in changed:
+        action = AuditAction.camera_activated if camera.is_active else AuditAction.camera_deactivated
+        record_audit(db, admin, action, AuditTargetType.camera, camera.id, label=label)
+    if changed - {"is_active"}:
+        record_audit(
+            db, admin, AuditAction.camera_updated, AuditTargetType.camera, camera.id, label=label
+        )
     db.commit()
     db.refresh(camera)
     return camera
