@@ -48,3 +48,18 @@ Frontend ile API sözleşmesi: GitHub issue #25 (FE-12).
 - `snapshot_path` yanıtta dönmez; `snapshot_url` = `/api/events/{id}/snapshot` ya da görüntü yoksa `null`. `track_id`, `location`, `stream_url` null olabilir.
 - Giriş form-encoded (`OAuth2PasswordRequestForm`), bunun için `python-multipart` gerekir.
 - Audit log kod döner (`user.login`, `event.status_changed`, `camera.created|updated|activated|deactivated`, `zone.created|deactivated`, `user.created`); `details` içinde `from/to` veya `label`.
+
+## İş bitti kontrolü (her uç / görev bittiğinde)
+
+Bir uç veya görev bittiğinde, cevabının sonuna aşağıdaki listeyi **Berkay'a hatırlatma olarak** ekle (commit/push/merge'ü Berkay yapar, sen yapma):
+
+1. **Test** — Bu uç için en az bir `pytest` testi var ve geçiyor mu?
+2. **Swagger** — Uç `/docs`'ta açıklamasıyla görünüyor mu?
+3. **Sözleşme** — Yanıt biçimi #25 / SPRINT_PLAN "API sözleşmesi" ile aynı mı? (`/api` öneki, `{items,total,limit,offset}`, hata kodları)
+4. **Küçük PR** — Bu iş tek başına PR olabilecek kadar küçük mü? PR açıklamasına hangi uçların eklendiğini yaz.
+5. **Haber ver** — Merge sonrası ucu kullanacak kişiye yazılacak mesajı hazırla:
+   - Olay, kamera, bölge, kullanıcı, giriş, istatistik uçları → **Aslı** (mock'tan gerçek API'ye geçecek)
+   - `POST /internal/events`, snapshot → **Cudi** (dedektör buraya gönderecek)
+   - `POST /api/assistant/query`, ajan araçları → **Emre**
+   Mesaj: uç adresi + örnek istek/yanıt + varsa sözleşmeden fark.
+6. **SPRINT_PLAN.md** — İlgili maddeyi `[x]` yap.
