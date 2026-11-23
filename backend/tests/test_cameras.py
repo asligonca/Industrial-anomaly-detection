@@ -64,6 +64,25 @@ def test_patch_with_new_stream_url_replaces(client, db_session, camera):
     assert stored.stream_url == "rtsp://op:yeni@10.0.1.12/s"
 
 
+def test_create_with_masked_stream_url_returns_422(client):
+    response = client.post(
+        "/api/cameras",
+        json={"name": "K", "area": "Depo", "stream_url": "rtsp://admin:***@10.0.1.11/stream"},
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["body", "stream_url"]
+
+
+def test_patch_with_other_masked_stream_url_returns_422(client, db_session, camera):
+    response = client.patch(
+        f"/api/cameras/{camera['id']}", json={"stream_url": "rtsp://admin:***@10.0.1.99/stream"}
+    )
+    assert response.status_code == 422
+    assert response.json()["detail"][0]["loc"] == ["body", "stream_url"]
+    stored = db_session.get(Camera, camera["id"])
+    assert stored.stream_url == "rtsp://admin:gizli123@10.0.1.11/stream"
+
+
 def test_patch_deactivate(client, camera):
     response = client.patch(f"/api/cameras/{camera['id']}", json={"is_active": False})
     assert response.json()["is_active"] is False

@@ -84,12 +84,12 @@ Tablolar (FE-12 / #25 kararları işlendi):
 
 **Hedef:** Operatör ve admin farklı yetkilerle giriş yapabilsin.
 
-- [ ] Parolaları bcrypt ile hash'le (`pwdlib` ya da `passlib[bcrypt]`)
-- [ ] `python-multipart` paketini ekle (ön yüz girişi form-encoded gönderiyor: FastAPI `OAuth2PasswordRequestForm`)
-- [ ] `POST /api/auth/login` (form: `username`, `password`) → `{access_token, token_type: "bearer", user: {id, username, role}}`; JWT içinde `role` claim'i; ömür 30–60 dk (`PyJWT`); `last_login_at` güncellenir
-- [ ] Kullanıcı uçları (yalnızca admin): `GET /api/users` (liste zarfıyla), `POST /api/users` `{username, password, role}` → 201; aynı ad → 409; parola en az 8 karakter. Düzenleme/silme şimdilik yok (uçlar ve bcrypt S1'de eklendi; kalan: admin yetkisi)
-- [ ] Yazma uçları (kamera, bölge, kullanıcı) yalnızca admin; operatör → 403
-- [ ] `get_current_user` ve `require_role("admin")` dependency'leri
+- [x] Parolaları bcrypt ile hash'le (`pwdlib` ya da `passlib[bcrypt]`)
+- [x] `python-multipart` paketini ekle (ön yüz girişi form-encoded gönderiyor: FastAPI `OAuth2PasswordRequestForm`)
+- [x] `POST /api/auth/login` (form: `username`, `password`) → `{access_token, token_type: "bearer", user: {id, username, role}}`; JWT içinde `role` claim'i; ömür 30–60 dk (`PyJWT`); `last_login_at` güncellenir
+- [x] Kullanıcı uçları (yalnızca admin): `GET /api/users` (liste zarfıyla), `POST /api/users` `{username, password, role}` → 201; aynı ad → 409; parola en az 8 karakter. Düzenleme/silme şimdilik yok
+- [x] Yazma uçları (kamera, bölge, kullanıcı) yalnızca admin; operatör → 403
+- [x] `get_current_user` ve `require_role("admin")` dependency'leri
 - [ ] Yetkiler: admin → kullanıcı/kamera/bölge yönetimi, loglar; operatör → olayları gör, alarm durumunu değiştir
 - [ ] `PATCH /api/events/{id}/status`, gövde `{status, note?}` → `alarm_actions` kaydı
   - Geçişler: new → reviewing | confirmed | false_alarm; reviewing → new | confirmed | false_alarm; confirmed / false_alarm → reviewing. Diğerleri `409 Conflict`
@@ -97,8 +97,9 @@ Tablolar (FE-12 / #25 kararları işlendi):
   - `action`: `user.login`, `user.created`, `event.status_changed` (`details: {from, to}`), `camera.created|updated|activated|deactivated`, `zone.created|deactivated`; `target_type`: `event | camera | zone | user`
   - Kod döner, metin değil; Türkçe metni ön yüz üretir. `details` içinde görüntü etiketi (ör. `{"label": "KAM-07"}`)
   - Sayfalama: `{items, total, limit, offset}`
-- [ ] CORS: sadece frontend adresi (`http://localhost:5173`)
-- [ ] Testler: yanlış parola, süresi dolmuş token, yetkisiz erişim
+- [x] CORS: sadece frontend adresi (`http://localhost:5173`)
+- [x] İlk admin komutu: `python -m app.scripts.create_admin --username admin`
+- [x] Testler: yanlış parola, süresi dolmuş token, yetkisiz erişim
 
 ## Sprint 3 — Olay akışı ve canlı alarm (7–20 Aralık)
 
