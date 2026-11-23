@@ -33,3 +33,10 @@ Hangi migration'da olduğunu görmek için: `alembic current`
 uvicorn app.main:app --reload
 ```
 API dokümantasyonu: http://127.0.0.1:8000/docs
+
+## Testler
+Test paketleri çalışma ortamı için gerekmez; ayrı dosyadadır:
+```powershell
+pip install -r requirements-dev.txt
+pytest
+```

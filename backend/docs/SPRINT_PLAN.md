@@ -59,8 +59,8 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [x] PR #27 (`Refs #25`) main'e birleştirildi (merge commit `0e73726`)
 
 ### 2. hafta — şemalar ve uçlar
-- [ ] Her tablo için Pydantic şemaları: `Create`, `Update`, `Read`
-- [ ] CRUD uçları (`/api` önekiyle), tüm listeler `{items, total, limit, offset}`:
+- [ ] Her tablo için Pydantic şemaları: `Create`, `Update`, `Read` (kamera, bölge, kullanıcı ✓; olay ve alarm kaydı kaldı)
+- [x] CRUD uçları (`/api` önekiyle), tüm listeler `{items, total, limit, offset}`:
   - `GET /api/cameras`, `POST /api/cameras` `{name, area, location?, stream_url, is_active?}` → 201, `PATCH /api/cameras/{id}` (kısmi) → 200
   - Kamera yanıtında `code` ("KAM-03") ve maskeli `stream_url`; PATCH'te `stream_url` gönderilmezse eskisi korunur
   - `GET /api/zones` (yalnızca aktifler), `POST /api/zones` `{name, camera_id, rule_type, polygon}` → 201 (polygon zorunlu), `DELETE /api/zones/{id}` → 204, soft delete
@@ -75,7 +75,7 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [ ] `GET /api/events/stats`: `by_type`, `by_camera`, `by_day`, `by_hour`; gruplama İstanbul saatine göre, `by_hour` her zaman 24 kayıt (boş saatler 0), `from`/`to` uygulanır
 - [ ] SQLite'tan gelen tarihleri yanıtta UTC (`Z`) olarak döndür
 - [ ] `seed.py`: 3 kamera, 50 sahte olay (`model_version`, `bbox` dolu); demo kullanıcılar en az 8 karakterli parolayla (ör. `admin1234`)
-- [ ] `pytest` + `TestClient` ile ilk testler
+- [x] `pytest` + `TestClient` ile ilk testler (`requirements-dev.txt`; kamera, bölge, kullanıcı uçları)
 - [ ] ER diyagramı (dbdiagram.io) → forma ekle
 
 **Sprint sonu çıktısı:** Swagger'dan kamera eklenip olay listesi filtrelenebiliyor; formun veritabanı bölümü dolu.
@@ -87,7 +87,7 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [ ] Parolaları bcrypt ile hash'le (`pwdlib` ya da `passlib[bcrypt]`)
 - [ ] `python-multipart` paketini ekle (ön yüz girişi form-encoded gönderiyor: FastAPI `OAuth2PasswordRequestForm`)
 - [ ] `POST /api/auth/login` (form: `username`, `password`) → `{access_token, token_type: "bearer", user: {id, username, role}}`; JWT içinde `role` claim'i; ömür 30–60 dk (`PyJWT`); `last_login_at` güncellenir
-- [ ] Kullanıcı uçları (yalnızca admin): `GET /api/users` (liste zarfıyla), `POST /api/users` `{username, password, role}` → 201; aynı ad → 409; parola en az 8 karakter. Düzenleme/silme şimdilik yok
+- [ ] Kullanıcı uçları (yalnızca admin): `GET /api/users` (liste zarfıyla), `POST /api/users` `{username, password, role}` → 201; aynı ad → 409; parola en az 8 karakter. Düzenleme/silme şimdilik yok (uçlar ve bcrypt S1'de eklendi; kalan: admin yetkisi)
 - [ ] Yazma uçları (kamera, bölge, kullanıcı) yalnızca admin; operatör → 403
 - [ ] `get_current_user` ve `require_role("admin")` dependency'leri
 - [ ] Yetkiler: admin → kullanıcı/kamera/bölge yönetimi, loglar; operatör → olayları gör, alarm durumunu değiştir
