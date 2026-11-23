@@ -6,8 +6,10 @@ from app.api.deps import AdminUser, DbSession, PaginationParams, paginate
 from app.api.errors import FORBIDDEN_RESPONSE, UNAUTHORIZED_RESPONSE
 from app.core.security import hash_password
 from app.models import User
+from app.models.enums import AuditAction, AuditTargetType
 from app.schemas.common import Page
 from app.schemas.user import UserCreate, UserRead
+from app.services.audit import record_audit
 
 router = APIRouter(
     prefix="/users",
@@ -32,7 +34,7 @@ def list_users(db: DbSession, pagination: PaginationParams, _admin: AdminUser):
     summary="Kullanıcı ekle",
     responses={409: {"description": "Kullanıcı adı zaten kullanılıyor"}},
 )
-def create_user(payload: UserCreate, db: DbSession, _admin: AdminUser):
+def create_user(payload: UserCreate, db: DbSession, admin: AdminUser):
     """Yeni kullanıcı ekler (yalnızca admin); parola bcrypt ile hash'lenir. Aynı ad varsa 409."""
     if db.scalar(select(User.id).where(User.username == payload.username)) is not None:
         raise HTTPException(status.HTTP_409_CONFLICT, USERNAME_TAKEN)
@@ -43,6 +45,10 @@ def create_user(payload: UserCreate, db: DbSession, _admin: AdminUser):
     )
     db.add(user)
     try:
+        db.flush()
+        record_audit(
+            db, admin, AuditAction.user_created, AuditTargetType.user, user.id, label=user.username
+        )
         db.commit()
     except IntegrityError:
         db.rollback()

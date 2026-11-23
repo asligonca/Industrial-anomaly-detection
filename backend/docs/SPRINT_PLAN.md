@@ -1,6 +1,6 @@
 # Backend Sprint Planı — Akıllı Endüstriyel Güvenlik Sistemi
 
-Sorumlu: Berkay Gündoğan · Son güncelleme: 14 Kasım 2026 (öğleden sonra)
+Sorumlu: Berkay Gündoğan · Son güncelleme: 23 Kasım 2026
 Kaynak doküman: https://claude.ai/artifact/NGXrmUzDrS4cNsjNyECM2F
 
 ## Özet
@@ -76,7 +76,7 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [x] SQLite'tan gelen tarihleri yanıtta UTC (`Z`) olarak döndür
 - [x] `seed.py`: 3 kamera, 50 sahte olay (`model_version`, `bbox` dolu); demo kullanıcılar en az 8 karakterli parolayla (ör. `admin1234`)
 - [x] `pytest` + `TestClient` ile ilk testler (`requirements-dev.txt`; kamera, bölge, kullanıcı uçları)
-- [ ] ER diyagramı (dbdiagram.io) → forma ekle
+- [x] ER diyagramı (dbdiagram.io) → forma ekle (raporda Şekil 3.2)
 
 **Sprint sonu çıktısı:** Swagger'dan kamera eklenip olay listesi filtrelenebiliyor; formun veritabanı bölümü dolu.
 
@@ -90,13 +90,15 @@ Tablolar (FE-12 / #25 kararları işlendi):
 - [x] Kullanıcı uçları (yalnızca admin): `GET /api/users` (liste zarfıyla), `POST /api/users` `{username, password, role}` → 201; aynı ad → 409; parola en az 8 karakter. Düzenleme/silme şimdilik yok
 - [x] Yazma uçları (kamera, bölge, kullanıcı) yalnızca admin; operatör → 403
 - [x] `get_current_user` ve `require_role("admin")` dependency'leri
-- [ ] Yetkiler: admin → kullanıcı/kamera/bölge yönetimi, loglar; operatör → olayları gör, alarm durumunu değiştir
-- [ ] `PATCH /api/events/{id}/status`, gövde `{status, note?}` → `alarm_actions` kaydı
+- [x] Yetkiler: admin → kullanıcı/kamera/bölge yönetimi, loglar; operatör → olayları gör, alarm durumunu değiştir
+- [x] `PATCH /api/events/{id}/status`, gövde `{status, note?}` → `alarm_actions` kaydı; yanıt güncel olay detayı; admin ve operatör; olay yoksa 404; not kırpılır, boşsa `null`, en fazla 500 karakter
   - Geçişler: new → reviewing | confirmed | false_alarm; reviewing → new | confirmed | false_alarm; confirmed / false_alarm → reviewing. Diğerleri `409 Conflict`
-- [ ] `audit_logs` modeli + `GET /api/audit-logs` (admin): `{id, user: {id, username} | null, action, target_type, target_id, details, created_at}`
+- [x] `audit_logs` modeli + `GET /api/audit-logs` (admin): `{id, user: {id, username} | null, action, target_type, target_id, details, created_at}`
   - `action`: `user.login`, `user.created`, `event.status_changed` (`details: {from, to}`), `camera.created|updated|activated|deactivated`, `zone.created|deactivated`; `target_type`: `event | camera | zone | user`
   - Kod döner, metin değil; Türkçe metni ön yüz üretir. `details` içinde görüntü etiketi (ör. `{"label": "KAM-07"}`)
-  - Sayfalama: `{items, total, limit, offset}`
+  - Sayfalama: `{items, total, limit, offset}`; en yeni üstte
+  - `action` ve `target_type` DB'de düz String (Enum/CHECK yok); yeni kodlar migration gerektirmez, doğrulama kodda
+  - Kayıt, işlemin kendisiyle aynı commit'te yazılır; `camera.updated` yalnızca bir alan gerçekten değiştiğinde (maskeli `stream_url`'in aynen geri gelmesi değişiklik sayılmaz)
 - [x] CORS: sadece frontend adresi (`http://localhost:5173`)
 - [x] İlk admin komutu: `python -m app.scripts.create_admin --username admin`
 - [x] Testler: yanlış parola, süresi dolmuş token, yetkisiz erişim
