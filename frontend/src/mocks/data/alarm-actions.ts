@@ -1,8 +1,11 @@
 import type { AlarmAction, EventStatus } from '@/types'
 import type { EventRow } from '../rows'
 import { events } from './events'
+import { users } from './users'
 
-const operator = { id: 2, username: 'operator' }
+/** Geçmişteki işlemleri yapan: fixture'daki ilk operatör (kimlik elle yazılmaz). */
+const operatorUser = users.find((u) => u.role === 'operator')!
+const operator = { id: operatorUser.id, username: operatorUser.username }
 
 /** ISO zamana dakika ekler. */
 const after = (iso: string, minutes: number) =>

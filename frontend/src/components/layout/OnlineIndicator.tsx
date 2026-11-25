@@ -12,9 +12,11 @@ export function OnlineIndicator() {
   const dot = !cameras ? 'bg-zinc-300' : allOnline ? 'bg-ok' : 'bg-warn'
 
   return (
-    <div className="flex h-[34px] items-center gap-2 whitespace-nowrap rounded-full border border-zinc-200 px-3 text-[13px] text-zinc-600">
+    <div className="flex h-[34px] items-center gap-2 whitespace-nowrap rounded-full border border-zinc-200 px-3 text-[13px] text-zinc-600 max-sm:px-2.5">
       <span aria-hidden className={`size-[7px] rounded-full ${dot}`} />
-      {online ?? '–'}/{total ?? '–'} kamera çevrimiçi
+      {online ?? '–'}/{total ?? '–'}
+      {/* Telefonda yalnızca "5/6"; açıklama ekran okuyucuya kalır. */}
+      <span className="max-sm:sr-only">kamera çevrimiçi</span>
     </div>
   )
 }

@@ -2,12 +2,12 @@ import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
 import { assistantActions } from '@/lib/eventRules'
 import { eventCode } from '@/lib/labels'
-import type { AssistantMessage, AssistantProposal } from '@/store/assistant'
+import type { AssistantMessage, AssistantProposal, ProposalRef } from '@/store/assistant'
 
 interface AssistantMessageItemProps {
   message: AssistantMessage
-  onApprove: (messageId: number, index: number, proposal: AssistantProposal) => void
-  onDismiss: (messageId: number, index: number) => void
+  onApprove: (ref: ProposalRef, proposal: AssistantProposal) => void
+  onDismiss: (ref: ProposalRef) => void
 }
 
 /** Konuşma balonu: asistan solda gri, kullanıcı sağda koyu. Öneri varsa altında onay düğmeleri. */
@@ -27,8 +27,8 @@ export function AssistantMessageItem({ message, onApprove, onDismiss }: Assistan
         <ProposalControls
           key={index}
           proposal={proposal}
-          onApprove={() => onApprove(message.id, index, proposal)}
-          onDismiss={() => onDismiss(message.id, index)}
+          onApprove={() => onApprove({ messageId: message.id, index }, proposal)}
+          onDismiss={() => onDismiss({ messageId: message.id, index })}
         />
       ))}
     </li>

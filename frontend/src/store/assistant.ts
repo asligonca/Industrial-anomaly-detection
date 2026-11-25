@@ -8,6 +8,12 @@ import { createJSONStorage, persist } from 'zustand/middleware'
  */
 export type ProposalState = 'pending' | 'saving' | 'done' | 'dismissed' | 'failed' | 'stale'
 
+/** Bir öneriyi bulmak için: hangi mesajın kaçıncı önerisi. */
+export interface ProposalRef {
+  messageId: number
+  index: number
+}
+
 export interface AssistantProposal extends AssistantAction {
   state: ProposalState
 }
@@ -32,7 +38,7 @@ interface AssistantState {
   /** Yanıtlar sesli okunsun mu. Bu tarayıcıda hatırlanır. */
   voiceEnabled: boolean
   addMessage: (from: AssistantMessage['from'], text: string, actions?: AssistantAction[]) => void
-  setProposalState: (messageId: number, index: number, state: ProposalState) => void
+  setProposalState: (ref: ProposalRef, state: ProposalState) => void
   setVoiceEnabled: (enabled: boolean) => void
   /** Çıkışta: konuşma silinir, ses tercihi kalır. */
   resetConversation: () => void
@@ -61,7 +67,7 @@ export const useAssistantStore = create<AssistantState>()(
             },
           ],
         })),
-      setProposalState: (messageId, index, state) =>
+      setProposalState: ({ messageId, index }, state) =>
         set((s) => ({
           messages: s.messages.map((m) =>
             m.id === messageId

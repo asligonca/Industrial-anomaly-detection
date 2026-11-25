@@ -37,3 +37,9 @@ export function useSpeech() {
     prepare: prepareVoice,
   }
 }
+
+/** Piper modeli inerken inen kısım (0–1), yoksa `null`. Okuma sahibi olmadan, salt okunur. */
+export function useVoiceDownload(): number | null {
+  const state = useSyncExternalStore(subscribeSpeech, getSpeechState)
+  return state.voice === 'loading' ? state.download : null
+}

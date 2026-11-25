@@ -5,7 +5,6 @@
  */
 import type {
   AgentLog,
-  AlarmAction,
   AuditAction,
   AuditDetails,
   AuditLog,
@@ -14,7 +13,6 @@ import type {
   User,
 } from '@/types'
 import { alarmActions } from './data/alarm-actions'
-import { cameraCode } from '@/lib/labels'
 import { auditLogs } from './data/audit-logs'
 import { cameras } from './data/cameras'
 import { events } from './data/events'
@@ -27,7 +25,7 @@ export const db = {
   cameras: structuredClone(cameras),
   zones: structuredClone(zones),
   events: structuredClone(events),
-  alarmActions: structuredClone(alarmActions) as AlarmAction[],
+  alarmActions: structuredClone(alarmActions),
   agentLogs: [] as AgentLog[],
   auditLogs: structuredClone(auditLogs),
   /** Kullanıcı adı -> parola. Yalnızca mock; yeni kullanıcı eklenince buraya da yazılır. */
@@ -37,8 +35,11 @@ export const db = {
 /** Kamera kaydı (silinmiş / bilinmeyen id'de `undefined`). */
 export const findCamera = (id: number) => db.cameras.find((c) => c.id === id)
 
-/** Kameranın adı; kamera yoksa kodu ("KAM-07"). Mock'un her yerinde aynı yedek. */
-export const cameraNameOf = (id: number) => findCamera(id)?.name ?? cameraCode(id)
+/**
+ * Kameranın adı; kamera yoksa "Bilinmeyen kamera". Kod değil: ekranlar zaten "KAM-07 · ad" yazıyor,
+ * kod yedek olunca "KAM-07 · KAM-07" çıkıyordu. (Backend'de olamaz: yabancı anahtar, kamera silinmez.)
+ */
+export const cameraNameOf = (id: number) => findCamera(id)?.name ?? 'Bilinmeyen kamera'
 
 export function nextId(rows: { id: number }[]): number {
   return rows.reduce((max, row) => Math.max(max, row.id), 0) + 1

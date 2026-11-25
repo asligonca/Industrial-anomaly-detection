@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/Button'
 import { inputClass } from '@/components/ui/inputStyles'
-import type { DayRange } from './recordsFilters'
+import { isOnlyDay, type DayRange } from './recordsFilters'
 
 interface DateRangeFilterProps extends DayRange {
   /** Seçilebilecek son gün (bugün), YYYY-MM-DD. */
@@ -13,8 +13,13 @@ const dateInputClass = inputClass('sm', 'font-mono')
 /**
  * Başlangıç ve bitiş günü. Başlangıç bitişten sonraya alınırsa bitiş de onunla birlikte kayar
  * (ve tersi), böylece aralık hiçbir zaman ters olmaz; hata mesajına gerek kalmaz.
+ * "Bugün" kısayolu aralığı bugüne çeker (saatlik grafikte "şu an" sütunu da görünür); zaten
+ * bugünse basılı görünür.
  */
 export function DateRangeFilter({ from, to, max, onChange }: DateRangeFilterProps) {
+  const today = max
+  const onlyToday = isOnlyDay({ from, to }, today)
+
   return (
     <fieldset className="flex flex-wrap items-end gap-2">
       <legend className="sr-only">Tarih aralığı</legend>
@@ -45,6 +50,14 @@ export function DateRangeFilter({ from, to, max, onChange }: DateRangeFilterProp
           className={dateInputClass}
         />
       </label>
+      <Button
+        variant={onlyToday ? 'primary' : 'secondary'}
+        size="sm"
+        aria-pressed={onlyToday}
+        onClick={() => onChange({ from: today, to: today })}
+      >
+        Bugün
+      </Button>
       {(from || to) && (
         <Button variant="secondary" size="sm" onClick={() => onChange({ from: '', to: '' })}>
           Tüm zamanlar

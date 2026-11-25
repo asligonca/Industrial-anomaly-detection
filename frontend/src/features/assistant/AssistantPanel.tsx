@@ -2,8 +2,9 @@ import { IconButton } from '@/components/ui/Button'
 import { CloseIcon, MicIcon } from '@/components/ui/icons'
 import { chipClass } from '@/components/ui/chipStyles'
 import { inputClass } from '@/components/ui/inputStyles'
-import { stopSpeech } from '@/lib/speech/player'
+import { prepareVoice, speechSupported, stopSpeech } from '@/lib/speech/player'
 import { voiceDownloadText } from '@/lib/speech/speechText'
+import { useVoiceDownload } from '@/lib/speech/useSpeech'
 import { useSpeechRecognition } from '@/lib/speech/useSpeechRecognition'
 import { useAssistantStore } from '@/store/assistant'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
@@ -21,7 +22,8 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   const messages = useAssistantStore((s) => s.messages)
   const voiceEnabled = useAssistantStore((s) => s.voiceEnabled)
   const setVoiceEnabled = useAssistantStore((s) => s.setVoiceEnabled)
-  const { ask, pending, approve, dismiss, speech } = useAssistantChat()
+  const { ask, pending, approve, dismiss, stopSpeaking } = useAssistantChat()
+  const download = useVoiceDownload()
   const [draft, setDraft] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -33,10 +35,9 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   useEffect(() => inputRef.current?.focus(), [])
 
   // Sesli yanıt açıksa model şimdiden insin; ilk yanıt beklemesin.
-  const { prepare } = speech
   useEffect(() => {
-    if (voiceEnabled && speech.supported) void prepare()
-  }, [voiceEnabled, speech.supported, prepare])
+    if (voiceEnabled && speechSupported) void prepareVoice()
+  }, [voiceEnabled])
 
   // Yeni mesajda en alta kaydır.
   useEffect(() => {
@@ -70,12 +71,11 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   }
 
   const toggleVoice = () => {
-    if (voiceEnabled) speech.stop()
+    if (voiceEnabled) stopSpeaking()
     setVoiceEnabled(!voiceEnabled)
   }
 
-  const subtitle =
-    speech.download !== null ? voiceDownloadText(speech.download) : 'Eller serbest · Türkçe'
+  const subtitle = download !== null ? voiceDownloadText(download) : 'Eller serbest · Türkçe'
 
   return (
     <section
@@ -92,7 +92,7 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
           <p className="text-xs text-zinc-500">{subtitle}</p>
         </div>
         <div className="flex items-center gap-1">
-          {speech.supported && (
+          {speechSupported && (
             <IconButton
               onClick={toggleVoice}
               aria-pressed={voiceEnabled}
@@ -121,11 +121,9 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
             <AssistantMessageItem
               key={message.id}
               message={message}
-              onApprove={(messageId, index, proposal) =>
-                void approve(messageId, index, proposal).then(refocusInput)
-              }
-              onDismiss={(messageId, index) => {
-                dismiss(messageId, index)
+              onApprove={(ref, proposal) => void approve(ref, proposal).then(refocusInput)}
+              onDismiss={(ref) => {
+                dismiss(ref)
                 inputRef.current?.focus()
               }}
             />

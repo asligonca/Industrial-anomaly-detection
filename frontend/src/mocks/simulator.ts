@@ -1,5 +1,5 @@
 import { eventCode } from '@/lib/labels'
-import { publicAssetUrl } from '@/lib/publicAssetUrl'
+import { mockCameraFrame, mockSubjectBox } from '@/lib/mockCameraAssets'
 import type { AlarmMessage, EventType, Severity } from '@/types'
 import { db, nextId } from './db'
 import type { EventRow } from './rows'
@@ -31,9 +31,6 @@ export function createSimulatedEvent(): EventRow | null {
   const camera = pick(cameras)
   const zones = db.zones.filter((z) => z.camera_id === camera.id && z.is_active)
   const [type, severity] = pick(typeSeverity)
-  // Kutu: [x1, y1, x2, y2], 0–1; ayakta bir insan boyunda.
-  const x1 = round2(0.1 + Math.random() * 0.7)
-  const y1 = round2(0.15 + Math.random() * 0.2)
   const id = nextId(db.events)
   const row: EventRow = {
     id,
@@ -43,8 +40,8 @@ export function createSimulatedEvent(): EventRow | null {
     type,
     confidence: round2(0.6 + Math.random() * 0.37),
     severity,
-    bbox: [x1, y1, round2(x1 + 0.08), round2(Math.min(1, y1 + 0.5))],
-    snapshot_url: publicAssetUrl(`assets/cam-${camera.id}.png`),
+    bbox: mockSubjectBox(camera.id),
+    snapshot_url: mockCameraFrame(camera.id),
     track_id: 400 + Math.floor(Math.random() * 600),
     status: 'new',
     created_at: new Date().toISOString(),

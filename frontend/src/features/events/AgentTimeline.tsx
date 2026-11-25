@@ -27,7 +27,11 @@ export function AgentTimeline({ eventId }: { eventId: number }) {
   }, [loaded, hash])
 
   return (
-    <Card ref={cardRef} id={ANALYSIS_ANCHOR} className="flex scroll-mt-20 flex-col gap-[18px]">
+    <Card
+      ref={cardRef}
+      id={ANALYSIS_ANCHOR}
+      className="flex scroll-mt-20 flex-col gap-[18px] max-sm:scroll-mt-28"
+    >
       <div className="flex items-baseline justify-between">
         <h2 className="text-base font-semibold">Ajan analizi</h2>
         {analysis.data && (

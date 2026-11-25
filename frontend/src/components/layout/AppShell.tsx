@@ -1,4 +1,4 @@
-import { ToastViewport } from '@/components/ui/Toast'
+import { MAIN_CONTENT_ID, ToastViewport } from '@/components/ui/Toast'
 import { useAlarmSocket } from '@/features/alarms/useAlarmSocket'
 import { AssistantDock } from '@/features/assistant/AssistantDock'
 import { Outlet } from 'react-router-dom'
@@ -14,7 +14,12 @@ export function AppShell() {
   return (
     <div className="flex min-h-screen flex-col">
       <TopBar />
-      <main className="mx-auto w-full max-w-[1360px] flex-1 px-6 pt-8 pb-28">
+      {/* `tabIndex={-1}`: bildirim kapanınca odak buraya verilebilsin (sekme sırasına girmez). */}
+      <main
+        id={MAIN_CONTENT_ID}
+        tabIndex={-1}
+        className="mx-auto w-full max-w-[1360px] flex-1 px-6 pt-8 pb-28 outline-none"
+      >
         <Outlet />
       </main>
       <AssistantDock />

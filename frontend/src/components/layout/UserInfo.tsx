@@ -9,7 +9,7 @@ export function UserInfo() {
   if (!user) return null
 
   return (
-    <div className="flex items-center gap-4">
+    <div className="flex items-center gap-4 max-sm:gap-2.5">
       <div className="flex items-center gap-2.5">
         <div
           aria-hidden
