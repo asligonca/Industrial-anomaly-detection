@@ -1,4 +1,5 @@
 import { Logo } from '@/components/Logo'
+import { LiveIndicator } from '@/features/alarms/LiveIndicator'
 import { MainNav } from './MainNav'
 import { OnlineIndicator } from './OnlineIndicator'
 import { UserInfo } from './UserInfo'
@@ -18,6 +19,7 @@ export function TopBar() {
       </div>
       <MainNav />
       <div className="flex flex-none items-center gap-4">
+        <LiveIndicator />
         <OnlineIndicator />
         <UserInfo />
       </div>

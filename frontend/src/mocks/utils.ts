@@ -101,13 +101,11 @@ export function createToken(user: User): string {
 }
 
 /**
- * Authorization: Bearer başlığından kullanıcıyı bulur. Geçersiz ya da süresi dolmuşsa, kullanıcı
- * yoksa ya da pasifse null. Backend gibi yetki token'daki role değil kayıttaki role göre verilir.
+ * Token'ın kullanıcısı. Geçersiz ya da süresi dolmuşsa, kullanıcı yoksa ya da pasifse null. Backend
+ * gibi yetki token'daki role değil kayıttaki role göre verilir. WebSocket `?token=` de bunu kullanır.
  */
-export function authenticate(request: Request): User | null {
-  const header = request.headers.get('Authorization') ?? ''
-  const token = header.startsWith('Bearer ') ? header.slice(7) : ''
-  if (!token.startsWith(TOKEN_PREFIX)) return null
+export function userFromToken(token: string | null): User | null {
+  if (!token?.startsWith(TOKEN_PREFIX)) return null
   try {
     const payload = JSON.parse(atob(token.slice(TOKEN_PREFIX.length))) as TokenPayload
     if (payload.exp < Date.now()) return null
@@ -115,6 +113,12 @@ export function authenticate(request: Request): User | null {
   } catch {
     return null
   }
+}
+
+/** Authorization: Bearer başlığından kullanıcıyı bulur (`userFromToken`). */
+export function authenticate(request: Request): User | null {
+  const header = request.headers.get('Authorization') ?? ''
+  return userFromToken(header.startsWith('Bearer ') ? header.slice(7) : null)
 }
 
 interface AuthedArgs<P extends PathParams> {

@@ -1,5 +1,6 @@
 import { Badge, SeverityBadge, StatusBadge } from '@/components/ui/Badge'
 import { Button, IconButton, LinkButton } from '@/components/ui/Button'
+import { CloseIcon, MicIcon } from '@/components/ui/icons'
 import { Card } from '@/components/ui/Card'
 import { chipClass } from '@/components/ui/chipStyles'
 import { Dialog } from '@/components/ui/Dialog'
@@ -13,6 +14,8 @@ import { Pagination } from '@/components/ui/Pagination'
 import { Select } from '@/components/ui/Select'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { Switch } from '@/components/ui/Switch'
+import { ToastViewport } from '@/components/ui/Toast'
+import { useToastStore } from '@/store/toasts'
 import type { EventStatus, Severity } from '@/types'
 import { useState, type ReactNode } from 'react'
 
@@ -31,21 +34,41 @@ function FilterChipsDemo() {
   )
 }
 
-/** Örnek ikon (gerçek ekranlarda ikon bileşeni kendi dosyasında). */
-function DemoIcon() {
+function ToastDemo() {
+  const push = useToastStore((s) => s.push)
   return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      aria-hidden
-    >
-      <rect x="9" y="3" width="6" height="11" rx="3" />
-      <path d="M5 11a7 7 0 0 0 14 0M12 18v3" />
-    </svg>
+    <div className="flex flex-wrap gap-3">
+      <Button
+        variant="secondary"
+        size="md"
+        onClick={() =>
+          push({
+            title: 'Yeni olay · OLY-015',
+            description: 'Yelek yok · Depo Rafları',
+            href: '/events/15',
+            tone: 'info',
+          })
+        }
+      >
+        Bilgi bildirimi
+      </Button>
+      <Button
+        variant="secondary"
+        size="md"
+        onClick={() =>
+          push({
+            title: 'Yeni olay · OLY-016',
+            description: 'Yasak bölge · Kimyasal Depo',
+            href: '/events/16',
+            tone: 'critical',
+          })
+        }
+      >
+        Kritik bildirim
+      </Button>
+      {/* /dev/ui AppShell dışında: bildirim alanı burada çizilir. */}
+      <ToastViewport />
+    </div>
   )
 }
 
@@ -146,25 +169,35 @@ export function UiKitPage() {
         </div>
       </Block>
 
-      <Block title="İkon düğmesi (ghost sm / outline md / alert md / kaydediliyor)">
+      <Block title="İkon düğmesi (ghost sm / outline md / alert md / kaydediliyor / round lg / round xl)">
         <div className="flex flex-wrap items-center gap-3">
           <IconButton label="Örnek (ghost)">
-            <DemoIcon />
+            <MicIcon />
           </IconButton>
           <IconButton label="Örnek (outline)" variant="outline" size="md">
-            <DemoIcon />
+            <MicIcon />
           </IconButton>
           <IconButton label="Örnek (alert)" variant="alert" size="md" aria-pressed>
-            <DemoIcon />
+            <MicIcon />
           </IconButton>
           <IconButton label="Örnek (kaydediliyor)" variant="outline" size="md" aria-disabled>
-            <DemoIcon />
+            <MicIcon />
+          </IconButton>
+          <IconButton label="Örnek (round lg)" variant="round" size="lg">
+            <CloseIcon />
+          </IconButton>
+          <IconButton label="Örnek (round xl)" variant="round" size="xl">
+            <MicIcon size={22} />
           </IconButton>
         </div>
       </Block>
 
       <Block title="Anahtar (açık / kapalı / kaydediliyor)">
         <SwitchDemo />
+      </Block>
+
+      <Block title="Bildirim (Toast: bilgi / kritik; 10 sn, üstündeyken durur)">
+        <ToastDemo />
       </Block>
 
       <Block title="Pencere (Dialog)">

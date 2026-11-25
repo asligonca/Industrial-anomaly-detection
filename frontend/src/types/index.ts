@@ -1,4 +1,6 @@
+export type * from './agent'
 export type * from './agent-log'
+export type * from './alarm'
 export type * from './alarm-action'
 export type * from './audit-log'
 export type * from './camera'

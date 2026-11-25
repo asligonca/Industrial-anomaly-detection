@@ -13,6 +13,10 @@ export const queryKeys = {
   zones: {
     all: ['zones'] as const,
   },
+  agents: {
+    all: ['agents'] as const,
+    status: ['agents', 'status'] as const,
+  },
   users: {
     all: ['users'] as const,
     list: (page: PageQuery) => ['users', 'list', page] as const,

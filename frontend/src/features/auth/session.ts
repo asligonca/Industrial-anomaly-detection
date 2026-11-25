@@ -3,6 +3,7 @@ import { stopSpeech } from '@/lib/speech/player'
 import { queryClient } from '@/queryClient'
 import { useAssistantStore } from '@/store/assistant'
 import { useAuthStore } from '@/store/auth'
+import { useToastStore } from '@/store/toasts'
 import { useUiStore } from '@/store/ui'
 import type { SessionUser } from '@/types'
 
@@ -17,6 +18,7 @@ export function endSession() {
   useAuthStore.getState().clearSession()
   useUiStore.getState().closeAssistant()
   useAssistantStore.getState().resetConversation()
+  useToastStore.getState().clear()
   stopSpeech()
   queryClient.clear()
 }

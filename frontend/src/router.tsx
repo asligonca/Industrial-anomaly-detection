@@ -11,7 +11,7 @@ import { EventsPage } from '@/features/events/EventsPage'
 import { LiveViewPage } from '@/features/live/LiveViewPage'
 import { LazyRecordsPage } from '@/features/records/LazyRecordsPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
-import { PlaceholderPage } from '@/pages/PlaceholderPage'
+import { AgentsPage } from '@/features/agents/AgentsPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -36,7 +36,7 @@ export const router = createBrowserRouter([
           { path: '/events', element: <EventsPage /> },
           { path: '/events/:id', element: <EventDetailPage /> },
           { path: '/records', element: <LazyRecordsPage /> },
-          { path: '/agents', element: <PlaceholderPage title="Ajan akışı" /> },
+          { path: '/agents', element: <AgentsPage /> },
           {
             // Yalnızca admin.
             element: <RequireRole role="admin" />,

@@ -5,14 +5,29 @@ import { ErrorBox } from '@/components/ui/ErrorBox'
 import { Skeleton } from '@/components/ui/Skeleton'
 import { cn } from '@/lib/cn'
 import { formatSeconds, formatTime } from '@/lib/format'
+import { ANALYSIS_ANCHOR } from '@/lib/eventLinks'
 import { agentLabels } from '@/lib/labels'
+import { useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 
-/** Olayı işleyen ajanların sırayla verdiği kararlar. Son adım (karar) turuncu işaretlenir. */
+/**
+ * Olayı işleyen ajanların sırayla verdiği kararlar. Son adım (karar) turuncu işaretlenir.
+ * Adres `#analiz` ile açıldıysa analiz yüklenince buraya kaydırılır (router çapaya kaydırmaz).
+ */
 export function AgentTimeline({ eventId }: { eventId: number }) {
   const analysis = useEventAnalysis(eventId)
+  const { hash } = useLocation()
+  const cardRef = useRef<HTMLDivElement>(null)
+  const loaded = !analysis.isPending
+
+  useEffect(() => {
+    if (loaded && hash === `#${ANALYSIS_ANCHOR}`) {
+      cardRef.current?.scrollIntoView({ block: 'start' })
+    }
+  }, [loaded, hash])
 
   return (
-    <Card className="flex flex-col gap-[18px]">
+    <Card ref={cardRef} id={ANALYSIS_ANCHOR} className="flex scroll-mt-20 flex-col gap-[18px]">
       <div className="flex items-baseline justify-between">
         <h2 className="text-base font-semibold">Ajan analizi</h2>
         {analysis.data && (

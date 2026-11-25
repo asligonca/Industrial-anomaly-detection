@@ -1,9 +1,11 @@
 import { canChangeStatus, severityRank } from '@/lib/eventRules'
 import { eventStatuses, severities } from '@/lib/labels'
-import type { AnomalyEvent, EventDetail, EventSortField, EventStatus, Severity } from '@/types'
+import type { EventSortField, EventStatus, Severity } from '@/types'
 import { http, HttpResponse } from 'msw'
 import { buildEventAnalysis } from '../analysis'
-import { cameraNameOf, db, findCamera, setEventStatus } from '../db'
+import { db, findCamera, setEventStatus } from '../db'
+import { toDetail, toEventResponse } from '../eventResponse'
+import { broadcastAlarm } from './alarms'
 import type { EventRow } from '../rows'
 import { buildEventStats } from '../stats'
 import {
@@ -15,9 +17,6 @@ import {
   readJsonObject,
   readPage,
 } from '../utils'
-
-/** Mock'taki tüm tespitler aynı modelden geliyor sayılır. */
-const MODEL_VERSION = 'yolo26n-exp1'
 
 /** Backend notu en fazla 500 karakter kabul eder. */
 const NOTE_MAX_LENGTH = 500
@@ -89,31 +88,6 @@ function queryMatcher(raw: string): ((event: EventRow) => boolean) | null {
 function findEvent(rawId: string): EventRow | Response {
   if (!/^\d+$/.test(rawId)) return errorResponse(422, 'id must be an integer')
   return db.events.find((e) => e.id === Number(rawId)) ?? errorResponse(404, 'Olay bulunamadı')
-}
-
-/** Liste öğesi: satır + kamera ve bölge özeti, model sürümü (backend `selectinload` ile ekler). */
-function toEventResponse(row: EventRow): AnomalyEvent {
-  const zone = db.zones.find((z) => z.id === row.zone_id)
-  return {
-    ...row,
-    camera: {
-      id: row.camera_id,
-      name: cameraNameOf(row.camera_id),
-      area: findCamera(row.camera_id)?.area ?? '',
-    },
-    zone: zone ? { id: zone.id, name: zone.name } : null,
-    model_version: MODEL_VERSION,
-  }
-}
-
-/** Detay: liste öğesi + durum geçmişi (eskiden yeniye). */
-function toDetail(row: EventRow): EventDetail {
-  return {
-    ...toEventResponse(row),
-    actions: db.alarmActions
-      .filter((a) => a.event_id === row.id)
-      .sort((a, b) => a.created_at.localeCompare(b.created_at)),
-  }
 }
 
 const sortKeys: Record<EventSortField, (e: EventRow) => number> = {
@@ -249,8 +223,11 @@ export const eventHandlers = [
       if (!canChangeStatus(event.status, status)) {
         return errorResponse(409, `Olay durumu ${event.status} → ${status} olarak değiştirilemez`)
       }
+      setEventStatus(event, status, user, note)
+      // Açık bütün oturumlar (diğer sekmeler) değişikliği görsün.
+      broadcastAlarm('event.updated', event)
       // Yanıt güncel olay detayı (`GET /events/{id}` ile aynı, `actions` dahil).
-      return HttpResponse.json(toDetail(setEventStatus(event, status, user, note)))
+      return HttpResponse.json(toDetail(event))
     }),
   ),
 ]
