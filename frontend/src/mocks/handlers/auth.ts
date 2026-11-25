@@ -32,7 +32,8 @@ export const authHandlers = [
         sameUsername(u.username, credentials.username) &&
         db.passwords[u.username] === credentials.password,
     )
-    if (!user) return errorResponse(401, 'Incorrect username or password')
+    // Backend gibi: pasif kullanıcı da aynı mesajla reddedilir.
+    if (!user || !user.is_active) return errorResponse(401, 'Kullanıcı adı ya da parola hatalı')
 
     user.last_login_at = new Date().toISOString()
     addAuditLog(user, 'user.login', { type: 'user', id: user.id }, { label: user.username })

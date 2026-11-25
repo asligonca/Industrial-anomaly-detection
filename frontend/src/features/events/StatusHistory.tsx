@@ -5,8 +5,8 @@ import type { AlarmAction } from '@/types'
 
 /**
  * Olayın durum geçmişi (`alarm_actions`): kim, ne zaman, hangi durumdan hangisine, not.
- * En yeni üstte; sözleşme sıra belirtmediği için zamana göre burada sıralanır. Saat, detay
- * açıldığı ana göre "Bugün / Dün" yazılır.
+ * En yeni üstte (backend eskiden yeniye döner, burada ters çevrilir). Saat, detay açıldığı ana
+ * göre "Bugün / Dün" yazılır. Kullanıcı silinmişse `user` null gelir.
  */
 export function StatusHistory({ actions, now }: { actions: AlarmAction[]; now: Date }) {
   const time = (action: AlarmAction) => new Date(action.created_at).getTime()
@@ -28,7 +28,9 @@ export function StatusHistory({ actions, now }: { actions: AlarmAction[]; now: D
                   <span className="sr-only"> durumundan </span>
                   {eventStatusLabels[action.to_status]}
                 </span>
-                <span className="text-zinc-500">{action.user.username}</span>
+                <span className="text-zinc-500">
+                  {action.user?.username ?? 'Silinmiş kullanıcı'}
+                </span>
               </div>
               <time dateTime={action.created_at} className="font-mono text-xs text-zinc-500">
                 {formatRelativeDayTime(new Date(action.created_at), now)}

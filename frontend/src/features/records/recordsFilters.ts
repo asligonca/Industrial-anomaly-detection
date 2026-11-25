@@ -77,7 +77,10 @@ function dayBoundary(day: string, end: boolean): string {
   return boundary.toISOString()
 }
 
-/** Grafikler yalnızca tarih aralığına bağlı (`GET /events/stats` başka filtre almaz). */
+/**
+ * Grafikler bilerek yalnızca tarih aralığına bağlı (`GET /events/stats` listenin filtrelerini de
+ * alır).
+ */
 export function toStatsRange({ from, to }: DayRange): EventStatsRange {
   return {
     ...(from ? { from: dayBoundary(from, false) } : {}),

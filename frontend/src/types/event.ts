@@ -29,6 +29,8 @@ export interface AnomalyEvent {
   /** Kamera özeti (backend `selectinload` ile ekler); ad için ayrıca kamera listesi gerekmez. */
   camera: EventCameraRef
   zone_id: number | null
+  /** Bölge özeti; bölgesiz tespitte `null`. Silinmiş (pasif) bölgenin adı da gelir. */
+  zone: EventZoneRef | null
   type: EventType
   confidence: number
   severity: Severity
@@ -40,6 +42,8 @@ export interface AnomalyEvent {
   snapshot_url: string | null
   /** Takip yapılmayan tespitlerde `null`. */
   track_id: number | null
+  /** Tespit modelinin sürümü, örn. "yolo26n-exp1". */
+  model_version: string
   status: EventStatus
   created_at: string
 }
@@ -51,18 +55,17 @@ export interface EventCameraRef {
   area: string
 }
 
-/** Olay detayındaki bölge özeti. */
+/** Olay yanıtındaki bölge özeti. */
 export interface EventZoneRef {
   id: number
   name: string
 }
 
-/** `GET /events/{id}` yanıtı: liste kaydı + bölge, tespit modeli sürümü ve durum geçmişi. */
+/**
+ * `GET /events/{id}` ve `PATCH /events/{id}/status` yanıtı: liste kaydı + durum geçmişi.
+ */
 export interface EventDetail extends AnomalyEvent {
-  zone: EventZoneRef | null
-  /** Örn. "yolo26n-exp1" */
-  model_version: string
-  /** Durum değişiklikleri (`alarm_actions`). Sıra sözleşmede yok; ekran zamana göre sıralar. */
+  /** Durum değişiklikleri (`alarm_actions`), backend eskiden yeniye sıralar. */
   actions: AlarmAction[]
 }
 
@@ -97,7 +100,9 @@ export type EventFilters = {
   offset?: number
 }
 
-/** `GET /events/stats` tarih aralığı. */
+/**
+ * `GET /events/stats` tarih aralığı. Backend listenin diğer filtrelerini de alır; ön yüz kullanmıyor.
+ */
 export type EventStatsRange = Pick<EventFilters, 'from' | 'to'>
 
 /** Sayfalı liste yanıtı (tüm liste uçları). */

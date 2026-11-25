@@ -1,3 +1,4 @@
+import { isNotFound } from '@/api/client'
 import { useEventAnalysis } from '@/api/hooks/useEventAnalysis'
 import { Card } from '@/components/ui/Card'
 import { ErrorBox } from '@/components/ui/ErrorBox'
@@ -27,6 +28,8 @@ export function AgentTimeline({ eventId }: { eventId: number }) {
           <Skeleton className="h-14" />
           <Skeleton className="h-14" />
         </div>
+      ) : analysis.isError && isNotFound(analysis.error) ? (
+        <p className="text-sm text-zinc-500">Bu olay için analiz yok.</p>
       ) : analysis.isError ? (
         <ErrorBox message="Analiz yüklenemedi." onRetry={() => void analysis.refetch()} />
       ) : analysis.data.steps.length === 0 ? (

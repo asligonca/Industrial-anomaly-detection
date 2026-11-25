@@ -24,9 +24,13 @@ export const queryKeys = {
   },
   events: {
     all: ['events'] as const,
+    /** Tüm listeler (filtreden bağımsız). */
+    lists: ['events', 'list'] as const,
     list: (filters: EventFilters) => ['events', 'list', filters] as const,
     detail: (id: number) => ['events', 'detail', id] as const,
     analysis: (id: number) => ['events', 'analysis', id] as const,
+    /** Tüm istatistikler (aralıktan bağımsız). */
+    allStats: ['events', 'stats'] as const,
     stats: (range: EventStatsRange) => ['events', 'stats', range] as const,
   },
 }

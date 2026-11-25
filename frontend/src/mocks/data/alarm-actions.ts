@@ -2,7 +2,7 @@ import type { AlarmAction, EventStatus } from '@/types'
 import type { EventRow } from '../rows'
 import { events } from './events'
 
-const operator = { id: 2, username: 'operator1' }
+const operator = { id: 2, username: 'operator' }
 
 /** ISO zamana dakika ekler. */
 const after = (iso: string, minutes: number) =>

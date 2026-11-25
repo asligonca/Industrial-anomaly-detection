@@ -13,8 +13,16 @@ export const networkDelay = () => delay(200 + Math.floor(Math.random() * 200))
 export const errorResponse = (status: number, detail: string) =>
   HttpResponse.json({ detail }, { status })
 
-export const unauthorized = () => errorResponse(401, 'Not authenticated')
-export const forbidden = () => errorResponse(403, 'Not enough permissions')
+/**
+ * Tek alanlık 422, FastAPI doğrulama hatasıyla aynı biçimde (backend `body_field_error`):
+ * `{ detail: [{ type, loc: ['body', alan], msg, input }] }`.
+ */
+export const fieldError = (field: string, msg: string, type: string, input: unknown) =>
+  HttpResponse.json({ detail: [{ type, loc: ['body', field], msg, input }] }, { status: 422 })
+
+// Backend'in Türkçe hata metinleri.
+export const unauthorized = () => errorResponse(401, 'Oturum geçersiz ya da süresi dolmuş')
+export const forbidden = () => errorResponse(403, 'Bu işlem için yetkiniz yok')
 export const invalidBody = () => errorResponse(422, 'Request body must be a valid JSON object')
 
 /** Gövdeyi JSON nesnesi olarak okur; bozuk ya da nesne değilse null (çağıran 422 döner). */
@@ -92,7 +100,10 @@ export function createToken(user: User): string {
   return TOKEN_PREFIX + btoa(JSON.stringify(payload))
 }
 
-/** Authorization: Bearer başlığından kullanıcıyı bulur. Geçersiz ya da süresi dolmuşsa null. */
+/**
+ * Authorization: Bearer başlığından kullanıcıyı bulur. Geçersiz ya da süresi dolmuşsa, kullanıcı
+ * yoksa ya da pasifse null. Backend gibi yetki token'daki role değil kayıttaki role göre verilir.
+ */
 export function authenticate(request: Request): User | null {
   const header = request.headers.get('Authorization') ?? ''
   const token = header.startsWith('Bearer ') ? header.slice(7) : ''
@@ -100,7 +111,7 @@ export function authenticate(request: Request): User | null {
   try {
     const payload = JSON.parse(atob(token.slice(TOKEN_PREFIX.length))) as TokenPayload
     if (payload.exp < Date.now()) return null
-    return db.users.find((u) => u.id === payload.sub) ?? null
+    return db.users.find((u) => u.id === payload.sub && u.is_active) ?? null
   } catch {
     return null
   }

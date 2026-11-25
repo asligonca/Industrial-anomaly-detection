@@ -17,6 +17,10 @@ export class ApiError extends Error {
 export const isConflict = (error: unknown): error is ApiError =>
   error instanceof ApiError && error.status === 409
 
+/** Kayıt (ya da uç) yok: tekrar denemenin anlamı yok. */
+export const isNotFound = (error: unknown): error is ApiError =>
+  error instanceof ApiError && error.status === 404
+
 type TokenProvider = () => string | null
 
 let getToken: TokenProvider = () => null

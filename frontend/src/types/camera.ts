@@ -14,6 +14,7 @@ export interface Camera {
   is_active: boolean
   /** Ekrandaki kamera grubu (Üretim, Depo...). SQL'de `GROUP` ayrılmış kelime olduğu için `area`. */
   area: string
+  created_at: string
 }
 
 /** `POST /cameras` gövdesi. `location` boş, `is_active` verilmezse `true`. */

@@ -230,7 +230,7 @@ export function UiKitPage() {
 
       <Block title="Girdi">
         <div className="grid gap-4 sm:grid-cols-2">
-          <Input label="Kullanıcı adı" defaultValue="operator1" />
+          <Input label="Kullanıcı adı" defaultValue="operator" />
           <Input label="Parola" type="password" error="Parola en az 4 karakter olmalı." />
           <Select label="Rol" defaultValue="operator">
             <option value="operator">Operatör</option>

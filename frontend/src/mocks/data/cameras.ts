@@ -1,5 +1,6 @@
 import { cameraCode } from '@/lib/labels'
 import type { Camera } from '@/types'
+import { atDay } from './time'
 
 export const cameras: Camera[] = [
   {
@@ -10,6 +11,7 @@ export const cameras: Camera[] = [
     stream_url: 'rtsp://10.0.1.11/stream',
     is_active: true,
     area: 'Üretim',
+    created_at: atDay(120, '10:00:00'),
   },
   {
     id: 2,
@@ -19,6 +21,7 @@ export const cameras: Camera[] = [
     stream_url: 'rtsp://10.0.1.12/stream',
     is_active: true,
     area: 'Depo',
+    created_at: atDay(120, '10:00:00'),
   },
   {
     id: 3,
@@ -28,6 +31,7 @@ export const cameras: Camera[] = [
     stream_url: 'rtsp://10.0.1.13/stream',
     is_active: true,
     area: 'Kısıtlı bölgeler',
+    created_at: atDay(120, '10:00:00'),
   },
   {
     id: 4,
@@ -37,6 +41,7 @@ export const cameras: Camera[] = [
     stream_url: 'rtsp://10.0.1.14/stream',
     is_active: true,
     area: 'Depo',
+    created_at: atDay(120, '10:00:00'),
   },
   {
     id: 5,
@@ -47,6 +52,7 @@ export const cameras: Camera[] = [
     // Çevrimdışı durumunu test etmek için kapalı.
     is_active: false,
     area: 'Üretim',
+    created_at: atDay(120, '10:00:00'),
   },
   {
     id: 6,
@@ -56,5 +62,6 @@ export const cameras: Camera[] = [
     stream_url: 'rtsp://admin:giris2026@10.0.1.16/stream',
     is_active: true,
     area: 'Kısıtlı bölgeler',
+    created_at: atDay(120, '10:00:00'),
   },
 ]

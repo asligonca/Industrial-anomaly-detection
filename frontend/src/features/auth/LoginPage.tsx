@@ -20,7 +20,7 @@ const tabs: {
   {
     role: 'operator',
     label: 'Operatör',
-    username: 'operator1',
+    username: 'operator',
     password: 'operator1234',
     submitLabel: 'Operatör olarak giriş yap',
   },

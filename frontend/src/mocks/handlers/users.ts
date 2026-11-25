@@ -42,13 +42,14 @@ export const userHandlers = [
       }
       // Kullanıcı adı büyük/küçük harfe duyarsız tekil: "Admin" ile "admin" aynı kişi (madde 31).
       if (db.users.some((u) => sameUsername(u.username, username))) {
-        return errorResponse(409, 'Username already exists')
+        return errorResponse(409, 'Bu kullanıcı adı zaten kullanılıyor')
       }
 
       const created: User = {
         id: nextId(db.users),
         username,
         role: body.role as Role,
+        is_active: true,
         created_at: new Date().toISOString(),
         last_login_at: null,
       }
