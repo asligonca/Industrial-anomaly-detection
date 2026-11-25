@@ -13,6 +13,10 @@ export const queryKeys = {
   zones: {
     all: ['zones'] as const,
   },
+  agents: {
+    all: ['agents'] as const,
+    status: ['agents', 'status'] as const,
+  },
   users: {
     all: ['users'] as const,
     list: (page: PageQuery) => ['users', 'list', page] as const,
@@ -24,9 +28,13 @@ export const queryKeys = {
   },
   events: {
     all: ['events'] as const,
+    /** Tüm listeler (filtreden bağımsız). */
+    lists: ['events', 'list'] as const,
     list: (filters: EventFilters) => ['events', 'list', filters] as const,
     detail: (id: number) => ['events', 'detail', id] as const,
     analysis: (id: number) => ['events', 'analysis', id] as const,
+    /** Tüm istatistikler (aralıktan bağımsız). */
+    allStats: ['events', 'stats'] as const,
     stats: (range: EventStatsRange) => ['events', 'stats', range] as const,
   },
 }

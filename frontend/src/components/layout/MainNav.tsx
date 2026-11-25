@@ -15,7 +15,10 @@ export function MainNav() {
   const firstRoleItem = visible.find((item) => item.role)
 
   return (
-    <nav aria-label="Ana menü" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto">
+    <nav
+      aria-label="Ana menü"
+      className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto max-sm:order-last max-sm:basis-full"
+    >
       {visible.map((item) => (
         <Fragment key={item.to}>
           {item === firstRoleItem && (

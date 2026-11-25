@@ -31,21 +31,29 @@ export function buttonClass(variant: ButtonVariant, size: ButtonSize, className?
 
 /**
  * İkon düğmesi. `ghost`: çerçevesiz (panel başlığındaki ses / kapat), `outline`: çerçeveli (metin
- * alanının yanında), `alert`: kırmızı dolu (ör. dinlerken mikrofon). İkon `currentColor` kullanır.
+ * alanının yanında), `alert`: kırmızı dolu (ör. dinlerken mikrofon), `round`: koyu yuvarlak (sesli
+ * özet oynat, asistan düğmesi). İkon `currentColor` kullanır.
  */
-export type IconButtonVariant = 'ghost' | 'outline' | 'alert'
-/** `sm` 36 px (başlık), `md` 42 px (`md` metin alanı ve düğmeyle aynı boy). */
-export type IconButtonSize = 'sm' | 'md'
+export type IconButtonVariant = 'ghost' | 'outline' | 'alert' | 'round'
+/**
+ * `sm` 36 px (başlık), `md` 42 px (`md` metin alanı ve düğmeyle aynı boy), `lg` 44 px (sesli özet),
+ * `xl` 56 px (sağ alttaki asistan düğmesi).
+ */
+export type IconButtonSize = 'sm' | 'md' | 'lg' | 'xl'
 
+// Köşe yuvarlaklığı türün parçası: `cn` sınıf çakışmasını çözmez, iki `rounded-*` yan yana olmasın.
 const iconVariants: Record<IconButtonVariant, string> = {
-  ghost: 'text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
-  outline: 'border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100',
-  alert: 'border border-danger bg-danger text-white',
+  ghost: 'rounded-control text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900',
+  outline: 'rounded-control border border-zinc-300 bg-white text-zinc-900 hover:bg-zinc-100',
+  alert: 'rounded-control border border-danger bg-danger text-white',
+  round: 'rounded-full bg-zinc-900 text-white hover:bg-zinc-700',
 }
 
 const iconSizes: Record<IconButtonSize, string> = {
   sm: 'size-9',
   md: 'size-[42px]',
+  lg: 'size-11',
+  xl: 'size-14',
 }
 
 export function iconButtonClass(
@@ -54,7 +62,7 @@ export function iconButtonClass(
   className?: string,
 ): string {
   return cn(
-    'grid flex-none place-items-center rounded-control disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60',
+    'grid flex-none place-items-center disabled:cursor-not-allowed disabled:opacity-60 aria-disabled:cursor-not-allowed aria-disabled:opacity-60',
     iconVariants[variant],
     iconSizes[size],
     className,

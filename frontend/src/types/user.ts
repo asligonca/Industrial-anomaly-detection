@@ -6,8 +6,10 @@ export interface User {
   id: number
   username: string
   role: Role
+  /** Pasif kullanıcı giriş yapamaz. Pasifleştirme ucu henüz yok. */
+  is_active: boolean
   created_at: string
-  /** FE-12 (#25) önerisi, backend onayı bekliyor. */
+  /** Hiç giriş yapmamışsa `null`. */
   last_login_at: string | null
 }
 

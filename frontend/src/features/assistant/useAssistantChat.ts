@@ -4,7 +4,7 @@ import { useUpdateEventStatus } from '@/api/hooks/useUpdateEventStatus'
 import { assistantActions } from '@/lib/eventRules'
 import { eventCode } from '@/lib/labels'
 import { useSpeech } from '@/lib/speech/useSpeech'
-import { useAssistantStore, type AssistantProposal } from '@/store/assistant'
+import { useAssistantStore, type AssistantProposal, type ProposalRef } from '@/store/assistant'
 import { useUiStore } from '@/store/ui'
 import type { AssistantAction } from '@/types'
 import { useCallback } from 'react'
@@ -16,8 +16,7 @@ import { useCallback } from 'react'
 export function useAssistantChat() {
   const query = useAssistantQuery()
   const updateStatus = useUpdateEventStatus()
-  const speech = useSpeech()
-  const { speak, stop } = speech
+  const { speak, stop } = useSpeech()
   const addMessage = useAssistantStore((s) => s.addMessage)
   const setProposalState = useAssistantStore((s) => s.setProposalState)
 
@@ -55,10 +54,10 @@ export function useAssistantChat() {
 
   const { mutateAsync: updateAsync } = updateStatus
   const approve = useCallback(
-    async (messageId: number, index: number, proposal: AssistantProposal) => {
+    async (ref: ProposalRef, proposal: AssistantProposal) => {
       const action = assistantActions[proposal.type]
       const code = eventCode(proposal.event_id)
-      setProposalState(messageId, index, 'saving')
+      setProposalState(ref, 'saving')
       try {
         await updateAsync({
           id: proposal.event_id,
@@ -66,24 +65,26 @@ export function useAssistantChat() {
           note: 'Sesli asistan önerisi onaylandı',
         })
         // Sonuç önerinin altında yazar; ayrıca balon eklenmez, yalnızca okunur.
-        setProposalState(messageId, index, 'done')
+        setProposalState(ref, 'done')
         say(`${code} ${action.done}.`)
       } catch (error) {
-        setProposalState(messageId, index, 'failed')
-        reply(
-          isConflict(error)
-            ? `${code} durumu bu arada değişmiş; işlem yapılmadı.`
+        const stale = isConflict(error)
+        setProposalState(ref, stale ? 'stale' : 'failed')
+        say(
+          stale
+            ? `${code} durumu bu arada değişmiş; öneri uygulanmadı.`
             : `${code} kaydedilemedi. Tekrar deneyin.`,
         )
       }
     },
-    [reply, say, setProposalState, updateAsync],
+    [say, setProposalState, updateAsync],
   )
 
   const dismiss = useCallback(
-    (messageId: number, index: number) => setProposalState(messageId, index, 'dismissed'),
+    (ref: ProposalRef) => setProposalState(ref, 'dismissed'),
     [setProposalState],
   )
 
-  return { ask, pending: isPending, approve, dismiss, speech }
+  /** `stopSpeaking`: yalnızca asistanın kendi okumasını durdurur. */
+  return { ask, pending: isPending, approve, dismiss, stopSpeaking: stop }
 }

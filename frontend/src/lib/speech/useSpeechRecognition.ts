@@ -16,13 +16,14 @@ interface Recognition {
 
 type RecognitionConstructor = new () => Recognition
 
-const RecognitionImpl: RecognitionConstructor | undefined =
+/** Chrome / Safari `webkit` önekiyle sunar. Tip tanımlarında yok: tek yerde daraltılır. */
+const speechWindow =
   typeof window === 'undefined'
     ? undefined
-    : ((window as unknown as Record<string, RecognitionConstructor | undefined>)
-        .SpeechRecognition ??
-      (window as unknown as Record<string, RecognitionConstructor | undefined>)
-        .webkitSpeechRecognition)
+    : (window as unknown as Record<string, RecognitionConstructor | undefined>)
+
+const RecognitionImpl: RecognitionConstructor | undefined =
+  speechWindow?.SpeechRecognition ?? speechWindow?.webkitSpeechRecognition
 
 const errorMessages: Partial<Record<SpeechRecognitionErrorCode, string>> = {
   'no-speech': 'Ses algılanmadı. Tekrar deneyin.',

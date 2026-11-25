@@ -26,8 +26,9 @@ export function getEventStats(range: EventStatsRange = {}, signal?: AbortSignal)
   return apiRequest<EventStats>('/events/stats', { query: range, signal })
 }
 
+/** Yanıt güncel olay detayı (`GET /events/{id}` ile aynı, durum geçmişi dahil). */
 export function updateEventStatus(id: number, update: EventStatusUpdate) {
-  return apiRequest<AnomalyEvent>(`/events/${id}/status`, { method: 'PATCH', json: update })
+  return apiRequest<EventDetail>(`/events/${id}/status`, { method: 'PATCH', json: update })
 }
 
 /** Olay görüntüsünün `<img src>` adresi: backend'in `snapshot_url`'i + token. Görüntü yoksa `null`. */

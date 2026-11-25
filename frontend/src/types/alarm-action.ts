@@ -8,6 +8,7 @@ export interface AlarmAction {
   from_status: EventStatus
   to_status: EventStatus
   note: string | null
-  user: UserRef
+  /** İşlemi yapan; kullanıcı silinmişse `null`. */
+  user: UserRef | null
   created_at: string
 }

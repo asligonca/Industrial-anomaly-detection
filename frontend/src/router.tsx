@@ -1,9 +1,7 @@
 import { AppShell } from '@/components/layout/AppShell'
 import { RequireAuth } from '@/features/auth/RequireAuth'
 import { LoginPage } from '@/features/auth/LoginPage'
-import { AuditPage } from '@/features/admin/AuditPage'
-import { CamerasZonesPage } from '@/features/admin/CamerasZonesPage'
-import { UsersPage } from '@/features/admin/UsersPage'
+import { LazyAuditPage, LazyCamerasZonesPage, LazyUsersPage } from '@/features/admin/LazyAdminPages'
 import { RequireRole } from '@/features/auth/RequireRole'
 import { createBrowserRouter } from 'react-router-dom'
 import { EventDetailPage } from '@/features/events/EventDetailPage'
@@ -11,7 +9,7 @@ import { EventsPage } from '@/features/events/EventsPage'
 import { LiveViewPage } from '@/features/live/LiveViewPage'
 import { LazyRecordsPage } from '@/features/records/LazyRecordsPage'
 import { NotFoundPage } from '@/pages/NotFoundPage'
-import { PlaceholderPage } from '@/pages/PlaceholderPage'
+import { AgentsPage } from '@/features/agents/AgentsPage'
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
@@ -21,6 +19,8 @@ export const router = createBrowserRouter([
         {
           path: '/dev/ui',
           lazy: async () => ({ Component: (await import('@/pages/dev/UiKitPage')).UiKitPage }),
+          // Sayfa doğrudan açılınca `lazy` inerken gösterilir (yoksa router uyarı verir).
+          hydrateFallbackElement: <p className="p-6 text-sm text-zinc-500">Yükleniyor…</p>,
         },
       ]
     : []),
@@ -36,17 +36,17 @@ export const router = createBrowserRouter([
           { path: '/events', element: <EventsPage /> },
           { path: '/events/:id', element: <EventDetailPage /> },
           { path: '/records', element: <LazyRecordsPage /> },
-          { path: '/agents', element: <PlaceholderPage title="Ajan akışı" /> },
+          { path: '/agents', element: <AgentsPage /> },
           {
             // Yalnızca admin.
             element: <RequireRole role="admin" />,
             children: [
               {
                 path: '/admin/cameras',
-                element: <CamerasZonesPage />,
+                element: <LazyCamerasZonesPage />,
               },
-              { path: '/admin/users', element: <UsersPage /> },
-              { path: '/admin/audit', element: <AuditPage /> },
+              { path: '/admin/users', element: <LazyUsersPage /> },
+              { path: '/admin/audit', element: <LazyAuditPage /> },
             ],
           },
           // Bilinmeyen adres de korumalı: girişsiz kullanıcı 404 yerine giriş ekranını görür.

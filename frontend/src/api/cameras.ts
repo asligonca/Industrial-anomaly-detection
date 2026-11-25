@@ -1,5 +1,5 @@
 import { config } from '@/config'
-import { publicAssetUrl } from '@/lib/publicAssetUrl'
+import { mockCameraFrame } from '@/lib/mockCameraAssets'
 import type { Camera, CameraCreate, CameraUpdate, Paginated } from '@/types'
 import { apiBaseUrl, apiRequest, withToken } from './client'
 
@@ -23,13 +23,9 @@ export function updateCamera(id: number, update: CameraUpdate) {
 
 /**
  * Kamera kartındaki görüntünün adresi. `<img src>` olarak kullanılır.
- * Mock: `public/assets/cam-N.png` statik karesi. Gerçek: `GET /cameras/{id}/stream` (MJPEG).
+ * Mock: `public/assets/cam-N.png` statik karesi (`mockCameraFrame`). Gerçek: `GET /cameras/{id}/stream` (MJPEG).
  * `<img>` Authorization başlığı gönderemez; token `?token=` ile gider (`withToken`).
  */
 export function cameraFrameUrl(id: number): string {
-  return withToken(
-    config.useMock
-      ? publicAssetUrl(`assets/cam-${id}.png`)
-      : `${apiBaseUrl()}/cameras/${id}/stream`,
-  )
+  return withToken(config.useMock ? mockCameraFrame(id) : `${apiBaseUrl()}/cameras/${id}/stream`)
 }

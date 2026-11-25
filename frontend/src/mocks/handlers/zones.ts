@@ -6,6 +6,7 @@ import {
   apiPath,
   authed,
   errorResponse,
+  fieldError,
   invalidBody,
   nonEmptyString,
   paginate,
@@ -48,7 +49,9 @@ export const zoneHandlers = [
       const name = nonEmptyString(body.name)
       if (!name) return errorResponse(422, 'name is required')
       const camera = db.cameras.find((c) => c.id === body.camera_id)
-      if (!camera) return errorResponse(422, 'camera_id must be an existing camera')
+      if (!camera) {
+        return fieldError('camera_id', 'Kamera bulunamadı', 'camera_not_found', body.camera_id)
+      }
       if (!ruleTypes.includes(body.rule_type as RuleType)) {
         return errorResponse(422, `rule_type must be one of: ${ruleTypes.join(', ')}`)
       }
@@ -75,7 +78,7 @@ export const zoneHandlers = [
       const id = parseId(params.id)
       if (id instanceof Response) return id
       const zone = db.zones.find((z) => z.id === id && z.is_active)
-      if (!zone) return errorResponse(404, 'Zone not found')
+      if (!zone) return errorResponse(404, 'Bölge bulunamadı')
       // Yumuşak silme: kayıt kalır, eski olaylar bölge adını korur.
       zone.is_active = false
       addAuditLog(user, 'zone.deactivated', { type: 'zone', id }, { label: zone.name })

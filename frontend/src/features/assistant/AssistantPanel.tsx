@@ -1,11 +1,13 @@
 import { IconButton } from '@/components/ui/Button'
+import { CloseIcon, MicIcon } from '@/components/ui/icons'
 import { chipClass } from '@/components/ui/chipStyles'
 import { inputClass } from '@/components/ui/inputStyles'
-import { stopSpeech } from '@/lib/speech/player'
+import { prepareVoice, speechSupported, stopSpeech } from '@/lib/speech/player'
+import { voiceDownloadText } from '@/lib/speech/speechText'
+import { useVoiceDownload } from '@/lib/speech/useSpeech'
 import { useSpeechRecognition } from '@/lib/speech/useSpeechRecognition'
 import { useAssistantStore } from '@/store/assistant'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { MicIcon } from './AssistantButton'
 import { AssistantMessageItem } from './AssistantMessageItem'
 import { ASSISTANT_PANEL_ID, ASSISTANT_SUGGESTIONS } from './constants'
 import { useAssistantChat } from './useAssistantChat'
@@ -20,7 +22,8 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   const messages = useAssistantStore((s) => s.messages)
   const voiceEnabled = useAssistantStore((s) => s.voiceEnabled)
   const setVoiceEnabled = useAssistantStore((s) => s.setVoiceEnabled)
-  const { ask, pending, approve, dismiss, speech } = useAssistantChat()
+  const { ask, pending, approve, dismiss, stopSpeaking } = useAssistantChat()
+  const download = useVoiceDownload()
   const [draft, setDraft] = useState('')
   const inputRef = useRef<HTMLInputElement>(null)
   const listRef = useRef<HTMLDivElement>(null)
@@ -32,10 +35,9 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   useEffect(() => inputRef.current?.focus(), [])
 
   // Sesli yanıt açıksa model şimdiden insin; ilk yanıt beklemesin.
-  const { prepare } = speech
   useEffect(() => {
-    if (voiceEnabled && speech.supported) void prepare()
-  }, [voiceEnabled, speech.supported, prepare])
+    if (voiceEnabled && speechSupported) void prepareVoice()
+  }, [voiceEnabled])
 
   // Yeni mesajda en alta kaydır.
   useEffect(() => {
@@ -69,14 +71,11 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
   }
 
   const toggleVoice = () => {
-    if (voiceEnabled) speech.stop()
+    if (voiceEnabled) stopSpeaking()
     setVoiceEnabled(!voiceEnabled)
   }
 
-  const subtitle =
-    speech.download !== null
-      ? `Ses hazırlanıyor… %${Math.round(speech.download * 100)}`
-      : 'Eller serbest · Türkçe'
+  const subtitle = download !== null ? voiceDownloadText(download) : 'Eller serbest · Türkçe'
 
   return (
     <section
@@ -93,7 +92,7 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
           <p className="text-xs text-zinc-500">{subtitle}</p>
         </div>
         <div className="flex items-center gap-1">
-          {speech.supported && (
+          {speechSupported && (
             <IconButton
               onClick={toggleVoice}
               aria-pressed={voiceEnabled}
@@ -122,11 +121,9 @@ export function AssistantPanel({ onClose }: { onClose: () => void }) {
             <AssistantMessageItem
               key={message.id}
               message={message}
-              onApprove={(messageId, index, proposal) =>
-                void approve(messageId, index, proposal).then(refocusInput)
-              }
-              onDismiss={(messageId, index) => {
-                dismiss(messageId, index)
+              onApprove={(ref, proposal) => void approve(ref, proposal).then(refocusInput)}
+              onDismiss={(ref) => {
+                dismiss(ref)
                 inputRef.current?.focus()
               }}
             />
@@ -211,23 +208,6 @@ function SpeakerIcon({ muted }: { muted: boolean }) {
       ) : (
         <path d="M15.5 8.5a5 5 0 0 1 0 7M18.5 5.5a9 9 0 0 1 0 13" />
       )}
-    </svg>
-  )
-}
-
-function CloseIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      aria-hidden
-    >
-      <path d="M6 6l12 12M18 6 6 18" />
     </svg>
   )
 }

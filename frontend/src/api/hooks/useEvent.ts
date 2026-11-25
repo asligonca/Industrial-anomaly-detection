@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { ApiError } from '../client'
+import { isNotFound } from '../client'
 import { getEvent } from '../events'
 import { queryKeys } from '../queryKeys'
 
@@ -10,6 +10,6 @@ export function useEvent(id: number | null) {
     queryFn: ({ signal }) => getEvent(id!, signal),
     enabled: id !== null,
     // Olay yoksa (404) tekrar denemenin anlamı yok.
-    retry: (count, error) => !(error instanceof ApiError && error.status === 404) && count < 1,
+    retry: (count, error) => !isNotFound(error) && count < 1,
   })
 }

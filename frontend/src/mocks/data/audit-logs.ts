@@ -4,11 +4,11 @@ import { today } from './time'
 export const auditLogs: AuditLog[] = [
   {
     id: 1,
-    user: { id: 2, username: 'operator1' },
+    user: { id: 2, username: 'operator' },
     action: 'user.login',
     target_type: 'user',
     target_id: 2,
-    details: { label: 'operator1' },
+    details: { label: 'operator' },
     created_at: today('08:47:00'),
   },
   {
@@ -22,7 +22,7 @@ export const auditLogs: AuditLog[] = [
   },
   {
     id: 3,
-    user: { id: 2, username: 'operator1' },
+    user: { id: 2, username: 'operator' },
     action: 'event.status_changed',
     target_type: 'event',
     target_id: 10,

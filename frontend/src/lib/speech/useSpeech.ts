@@ -32,9 +32,14 @@ export function useSpeech() {
     progress: mine ? state.progress : 0,
     /** Piper modeli inerken inen kısım (0–1), yoksa `null`. Bütün bileşenler görür. */
     download: state.voice === 'loading' ? state.download : null,
-    voice: state.voice,
     speak,
     stop,
     prepare: prepareVoice,
   }
+}
+
+/** Piper modeli inerken inen kısım (0–1), yoksa `null`. Okuma sahibi olmadan, salt okunur. */
+export function useVoiceDownload(): number | null {
+  const state = useSyncExternalStore(subscribeSpeech, getSpeechState)
+  return state.voice === 'loading' ? state.download : null
 }

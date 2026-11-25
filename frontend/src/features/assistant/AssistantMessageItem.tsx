@@ -2,12 +2,12 @@ import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/cn'
 import { assistantActions } from '@/lib/eventRules'
 import { eventCode } from '@/lib/labels'
-import type { AssistantMessage, AssistantProposal } from '@/store/assistant'
+import type { AssistantMessage, AssistantProposal, ProposalRef } from '@/store/assistant'
 
 interface AssistantMessageItemProps {
   message: AssistantMessage
-  onApprove: (messageId: number, index: number, proposal: AssistantProposal) => void
-  onDismiss: (messageId: number, index: number) => void
+  onApprove: (ref: ProposalRef, proposal: AssistantProposal) => void
+  onDismiss: (ref: ProposalRef) => void
 }
 
 /** Konuşma balonu: asistan solda gri, kullanıcı sağda koyu. Öneri varsa altında onay düğmeleri. */
@@ -27,8 +27,8 @@ export function AssistantMessageItem({ message, onApprove, onDismiss }: Assistan
         <ProposalControls
           key={index}
           proposal={proposal}
-          onApprove={() => onApprove(message.id, index, proposal)}
-          onDismiss={() => onDismiss(message.id, index)}
+          onApprove={() => onApprove({ messageId: message.id, index }, proposal)}
+          onDismiss={() => onDismiss({ messageId: message.id, index })}
         />
       ))}
     </li>
@@ -52,19 +52,34 @@ function ProposalControls({ proposal, onApprove, onDismiss }: ProposalControlsPr
   if (proposal.state === 'dismissed') {
     return <p className="mt-2 text-xs text-zinc-500">Öneri uygulanmadı.</p>
   }
+  if (proposal.state === 'stale') {
+    return (
+      <p role="status" className="mt-2 text-xs text-zinc-500">
+        {`${code} durumu bu arada değişmiş; öneri uygulanmadı.`}
+      </p>
+    )
+  }
 
   const saving = proposal.state === 'saving'
+  const failed = proposal.state === 'failed'
   return (
-    <div className="mt-2.5 flex flex-wrap gap-2">
+    <div className="mt-2.5 flex flex-wrap items-center gap-2">
+      {failed && (
+        <p role="alert" className="w-full text-xs text-danger">
+          {`${code} kaydedilemedi.`}
+        </p>
+      )}
       <Button
         size="sm"
         aria-disabled={saving || undefined}
         onClick={() => {
           if (!saving) onApprove()
         }}
-        aria-label={saving ? `${code}: kaydediliyor` : `${code}: ${action.label}`}
+        aria-label={
+          saving ? `${code}: kaydediliyor` : `${code}: ${failed ? 'tekrar dene' : action.label}`
+        }
       >
-        {saving ? 'Kaydediliyor…' : action.label}
+        {saving ? 'Kaydediliyor…' : failed ? 'Tekrar dene' : action.label}
       </Button>
       <Button
         size="sm"
