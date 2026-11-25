@@ -52,19 +52,34 @@ function ProposalControls({ proposal, onApprove, onDismiss }: ProposalControlsPr
   if (proposal.state === 'dismissed') {
     return <p className="mt-2 text-xs text-zinc-500">Öneri uygulanmadı.</p>
   }
+  if (proposal.state === 'stale') {
+    return (
+      <p role="status" className="mt-2 text-xs text-zinc-500">
+        {`${code} durumu bu arada değişmiş; öneri uygulanmadı.`}
+      </p>
+    )
+  }
 
   const saving = proposal.state === 'saving'
+  const failed = proposal.state === 'failed'
   return (
-    <div className="mt-2.5 flex flex-wrap gap-2">
+    <div className="mt-2.5 flex flex-wrap items-center gap-2">
+      {failed && (
+        <p role="alert" className="w-full text-xs text-danger">
+          {`${code} kaydedilemedi.`}
+        </p>
+      )}
       <Button
         size="sm"
         aria-disabled={saving || undefined}
         onClick={() => {
           if (!saving) onApprove()
         }}
-        aria-label={saving ? `${code}: kaydediliyor` : `${code}: ${action.label}`}
+        aria-label={
+          saving ? `${code}: kaydediliyor` : `${code}: ${failed ? 'tekrar dene' : action.label}`
+        }
       >
-        {saving ? 'Kaydediliyor…' : action.label}
+        {saving ? 'Kaydediliyor…' : failed ? 'Tekrar dene' : action.label}
       </Button>
       <Button
         size="sm"

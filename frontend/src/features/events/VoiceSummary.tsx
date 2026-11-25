@@ -1,5 +1,7 @@
+import { IconButton } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { cn } from '@/lib/cn'
+import { voiceDownloadText } from '@/lib/speech/speechText'
 import { useSpeech } from '@/lib/speech/useSpeech'
 
 const BAR_COUNT = 40
@@ -23,12 +25,12 @@ export function VoiceSummary({ text }: { text: string }) {
       </div>
 
       <div className="flex items-center gap-3.5">
-        <button
-          type="button"
+        <IconButton
           onClick={() => (active ? stop() : void speak(text))}
           disabled={!supported}
-          aria-label={active ? 'Durdur' : 'Oynat'}
-          className="grid size-11 flex-none place-items-center rounded-full bg-zinc-900 text-white hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+          label={active ? 'Durdur' : 'Oynat'}
+          variant="round"
+          size="lg"
         >
           <svg aria-hidden width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
             {active ? (
@@ -40,7 +42,7 @@ export function VoiceSummary({ text }: { text: string }) {
               <path d="M7 4l13 8-13 8z" />
             )}
           </svg>
-        </button>
+        </IconButton>
         <div aria-hidden className="flex h-10 flex-1 items-center gap-[3px]">
           {bars.map((height, i) => (
             <div
@@ -58,7 +60,7 @@ export function VoiceSummary({ text }: { text: string }) {
 
       {status === 'preparing' && download !== null && (
         <p role="status" className="text-[13px] text-zinc-500">
-          {`Ses hazırlanıyor… %${Math.round(download * 100)} (ilk seferde bir kez iner)`}
+          {`${voiceDownloadText(download)} (ilk seferde bir kez iner)`}
         </p>
       )}
       <p className="text-sm leading-relaxed text-zinc-600">{text}</p>

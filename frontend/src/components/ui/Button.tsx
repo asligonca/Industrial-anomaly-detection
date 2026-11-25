@@ -47,7 +47,7 @@ interface IconButtonProps extends Omit<ComponentProps<'button'>, 'aria-label'> {
   size?: IconButtonSize
 }
 
-/** Yalnızca ikonlu düğme (ses aç/kapat, kapat ×, mikrofon). */
+/** Yalnızca ikonlu düğme (ses aç/kapat, kapat ×, mikrofon, oynat, asistan). */
 export function IconButton({
   label,
   variant = 'ghost',

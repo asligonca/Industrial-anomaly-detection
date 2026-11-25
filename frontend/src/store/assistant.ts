@@ -2,8 +2,11 @@ import type { AssistantAction } from '@/types'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-/** Önerinin durumu: onay bekliyor, kaydediliyor, uygulandı, vazgeçildi, kaydedilemedi. */
-export type ProposalState = 'pending' | 'saving' | 'done' | 'dismissed' | 'failed'
+/**
+ * Önerinin durumu: onay bekliyor, kaydediliyor, uygulandı, vazgeçildi, kaydedilemedi (yeniden
+ * denenebilir), olayın durumu bu arada değişmiş (409; yeniden denemek hep 409 olur, kapanır).
+ */
+export type ProposalState = 'pending' | 'saving' | 'done' | 'dismissed' | 'failed' | 'stale'
 
 export interface AssistantProposal extends AssistantAction {
   state: ProposalState

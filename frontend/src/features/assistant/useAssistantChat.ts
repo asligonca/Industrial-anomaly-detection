@@ -69,15 +69,16 @@ export function useAssistantChat() {
         setProposalState(messageId, index, 'done')
         say(`${code} ${action.done}.`)
       } catch (error) {
-        setProposalState(messageId, index, 'failed')
-        reply(
-          isConflict(error)
-            ? `${code} durumu bu arada değişmiş; işlem yapılmadı.`
+        const stale = isConflict(error)
+        setProposalState(messageId, index, stale ? 'stale' : 'failed')
+        say(
+          stale
+            ? `${code} durumu bu arada değişmiş; öneri uygulanmadı.`
             : `${code} kaydedilemedi. Tekrar deneyin.`,
         )
       }
     },
-    [reply, say, setProposalState, updateAsync],
+    [say, setProposalState, updateAsync],
   )
 
   const dismiss = useCallback(
